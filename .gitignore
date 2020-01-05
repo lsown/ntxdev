@@ -1,2 +1,16 @@
+
+
+#cache
+__pycache__
+
 # Virtual environment
 venv
+
+# Installer logs
+pip-log.txt
+
+# SQLite databases
+*.sqlite
+
+
+*.pyc
