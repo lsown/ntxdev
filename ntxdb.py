@@ -1,24 +1,22 @@
 import time
 import sys
-import datetime
+from datetime import datetime
 import ntxpi
+from influxdb import InfluxDBClient
+
 
 # Configure InfluxDB connection variables
-host = "192.168.29.190" # My Ubuntu NUC
+host = "localhost" # localhost default on pi, can also use IP.
 port = 8086 # default port
 user = "pi" # the user/password created for the pi, with write access
 password = "test" 
 dbname = "mydb" # the database we created earlier
-interval = 60 # Sample period in seconds
+interval = 1 # Sample period in seconds
 
 # Create the InfluxDB client object
-client = InfluxDBClient(host, port, user, password, dbname)
+client = InfluxDBClient(host=host, port=port, user=user, password=password, database=dbname)
 aquarium = ntxpi.aquarium()
 
-
-# Enter the sensor details
-sensor = Adafruit_DHT.DHT22
-sensor_gpio = 4
 
 # think of measurement as a SQL table, it's not...but...
 measurement = "aquarium"
@@ -31,7 +29,8 @@ try:
   while True:
       # Read the sensor using the configured driver and gpio
       temperature = aquarium.get_status()
-      iso = time.ctime()
+      current_time = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
+
       # Print for debugging, uncomment the below line
       # print("[%s] Temp: %s, Humidity: %s" % (iso, temperature, humidity)) 
       # Create the JSON data structure
@@ -41,7 +40,7 @@ try:
             "tags": {
                 "location": location,
             },
-            "time": iso,
+            "time": current_time,
             "fields": {
                 "temperature" : temperature
             }
