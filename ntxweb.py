@@ -7,19 +7,20 @@ from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+import ntxpi
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'hard to guess string'
-app.config['SQLALCHEMY_DATABASE_URI'] =\
-    'sqlite:///' + os.path.join(basedir, 'data.sqlite')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+#app.config['SQLALCHEMY_DATABASE_URI'] =\
+#    'sqlite:///' + os.path.join(basedir, 'data.sqlite')
+#app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 bootstrap = Bootstrap(app)
 moment = Moment(app)
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
+#db = SQLAlchemy(app)
+#migrate = Migrate(app, db)
 
 @app.shell_context_processor
 def make_shell_context():
@@ -34,13 +35,15 @@ def page_not_found(e):
 def internal_server_error(e):
     return render_template('500.html'), 500
 
-
 @app.route('/')
 def index():
-    return render_template('index.html')
+	aquarium = ntxpi.aquarium()
+#	aqdict = {'a': 23,'b':50, 'c':30} #testercode
+	aqdict = aquarium.get_status() #returns a dictionary
+	return render_template('index.html', aqdict = aqdict)
 
-@app.route('/')
-def index():
+@app.route('/onewire')
+def onewire():
     return render_template('index.html')
 
 if __name__ == '__main__': 

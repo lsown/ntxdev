@@ -15,6 +15,8 @@ interval = 1 # Sample period in seconds
 
 # Create the InfluxDB client object
 client = InfluxDBClient(host=host, port=port, user=user, password=password, database=dbname)
+
+# Create an aquarium object, shift this to ntxpi later?
 aquarium = ntxpi.aquarium()
 
 
@@ -32,7 +34,7 @@ try:
       current_time = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
 
       # Print for debugging, uncomment the below line
-      # print("[%s] Temp: %s, Humidity: %s" % (iso, temperature, humidity)) 
+      # print("[%s] Temp: %s (iso, temperature, humidity)) 
       # Create the JSON data structure
       data = [
       {
