@@ -10,12 +10,12 @@ from datetime import datetime
 class aquarium:
     def __init__(self):
         self.aquariumID = 100
-#       self.aqtemp = onewiretemp.onewiretemp() #creates an temp object
+        self.aqtemp = onewiretemp.onewiretemp() #creates an temp object
 
 
     def get_status(self):
         return {
-            'temp': 20,
+            'temp': self.get_temp(),
             'motor1' : 'ON',
             'motor2' : 'OFF',
             'AqFlag' : 'LOW',
