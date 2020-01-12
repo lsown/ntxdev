@@ -5,8 +5,8 @@ from flask_moment import Moment
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
+#from flask_sqlalchemy import SQLAlchemy
+#from flask_migrate import Migrate
 import ntxpi
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -47,4 +47,4 @@ def onewire():
     return render_template('index.html')
 
 if __name__ == '__main__': 
-  app.run(debug=True) 
+  app.run(host='0.0.0.0',debug=True) 
