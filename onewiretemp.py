@@ -14,14 +14,22 @@ class onewiretemp:
     def __init__(self):
         self.base_dir = '/sys/bus/w1/devices/'
         #the 0 pulls the item out of a list, which is what glob creates.
-        self.device_folder = glob.glob(self.base_dir + '28*')[0]
+        if glob.glob(self.base_dir + '28*'): # validation if it exists
+            self.device_folder = glob.glob(self.base_dir + '28*')[0]
+        else: 
+            self.device_folder = 'failed'
         self.device_file = self.device_folder + '/w1_slave'
 
     # A function that reads the sensors data
     def read_temp_raw(self):
-        f = open(self.device_file, 'r') # Opens the temperature device file
-        lines = f.readlines() # Returns the text
-        f.close()
+        #simulated w1 - provides a failed simulation
+        if self.device_file == 'failed/w1_slave':
+            lines = ['YES', 't=0']
+        #normal operation
+        else:
+            f = open(self.device_file, 'r') # Opens the temperature device file
+            lines = f.readlines() # Returns a list of 2 strings
+            f.close()
         return lines
 
     # Convert the value of the sensor into a temperature
@@ -32,7 +40,7 @@ class onewiretemp:
     # and then read the device file again.
         while lines[0].strip()[-3:] != 'YES':
             time.sleep(0.2)
-            lines = read_temp_raw()
+            lines = self.read_temp_raw()
 
     # Look for the position of the '=' in the second line of the
     # device file.
