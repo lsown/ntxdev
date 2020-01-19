@@ -68,8 +68,8 @@ class aquarium:
 
     def buttonPress(self, channel):
         #GPIO.add_event_detect(channel, GPIO.RISING, callback=my_callback, bouncetime=200)
-        print('hi')
-        print(str(channel))
+        print('button')
+        print(channel)
 
     def levelSensor(self, channel):
         #GPIO.add_event_detect(channel, GPIO.RISING, callback=my_callback, bouncetime=200)
