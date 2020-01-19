@@ -38,8 +38,8 @@ class aquarium:
             18 : {'name' : 'LEDPwr', 'state' : 0} 
         }
         self.motors = {
-            drv1 : {'name' : 'aqPump', 'i2cAddress' : 0x60, 'voltage' : 0, 'direction' : 'cw'}
-            drv2 : {'name' : 'wastePump', 'i2cAddress' : 0x61, 'voltage' : 0, 'direction' : 'cw'}
+            drv1 : {'name' : 'aqPump', 'i2cAddress' : 0x60, 'voltage' : 0, 'direction' : 'cw'},
+            drv2 : {'name' : 'wastePump', 'i2cAddress' : 0x61, 'voltage' : 0, 'direction' : 'cw'},
             drv3 : {'name' : 'sparePump', 'i2cAddress' : 0x62, 'voltage' : 0, 'direction' : 'cw'}
         }
         self.piSetup()
