@@ -40,7 +40,7 @@ class aquarium:
         }
         self.pinsOut = {
             #24 : {'name' : 'I2C RST', 'state' : 0},
-            LEDPwr : {'name' : 'LEDPwr', 'state' : 0, 'pin' : 18} 
+            'LEDPwr' : {'name' : 'LEDPwr', 'state' : 0, 'pin' : 18} 
         }
         self.motors = {
             'drv0' : {'name' : 'aqPump', 'i2cAddress' : 0x60, 'speed' : 0, 'direction' : 'cw'},
