@@ -40,7 +40,7 @@ class aquarium:
         }
         self.pinsOut = {
             #24 : {'name' : 'I2C RST', 'state' : 0},
-            18 : {'name' : 'LEDPwr', 'state' : 0} 
+            LEDPwr : {'name' : 'LEDPwr', 'state' : 0, 'pin' : 18} 
         }
         self.motors = {
             'drv0' : {'name' : 'aqPump', 'i2cAddress' : 0x60, 'speed' : 0, 'direction' : 'cw'},
@@ -54,7 +54,7 @@ class aquarium:
     def piSetup(self): #Sets up GPIO pins, can also add to GPIO.in <pull_up_down=GPIO.PUD_UP>
 
         for pin in self.pinsOut:
-            GPIO.setup(pin, GPIO.OUT, initial = GPIO.LOW)
+            GPIO.setup(pin['pin'], GPIO.OUT, initial = GPIO.LOW)
             print('0')
         for pin in self.pinsIn:
             GPIO.setup(pin, GPIO.IN)
@@ -75,6 +75,9 @@ class aquarium:
     def buttonPress(self, channel):
         #GPIO.add_event_detect(channel, GPIO.RISING, callback=my_callback, bouncetime=200)
         print('button')
+        GPIO.output(self.pinsOut['LEDPWR']['pin'], 1)
+        time.sleep(1000)
+        GPIO.output(self.pinsOut['LEDPWR']['pin'], 0)
         print(channel)
 
     def levelSensor(self, channel):
@@ -93,6 +96,8 @@ class aquarium:
         print('hi')
 
     def motorControl(self, name='drv0', i2cAddress=0x60, speed=1, direction='forward'):
+        if speed > 1:
+            speed = 1
         voltage = (2 * float(speed)) + 3
         if name == 'drv0':
             self.drv0.set_direction(direction)
