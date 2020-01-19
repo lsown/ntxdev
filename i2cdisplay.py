@@ -11,7 +11,7 @@ class display:
 		self.HEIGHT = 64
 		self.BORDER = 5
 		self.i2c = board.I2C()
-		self.oled = adafruit_ssd1306.SSD1306_I2C(self.WIDTH, self.HEIGHT, self.i2c, addr=0x3c, reset=self.oled_reset)
+		self.oled = adafruit_ssd1306.SSD1306_I2C(self.WIDTH, self.HEIGHT, self.i2c, addr=0x3c) #reset taken out
 
 	def drawStatus(self, textfield):
 		self.oled.fill(0)
