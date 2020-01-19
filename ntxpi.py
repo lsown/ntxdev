@@ -22,16 +22,17 @@ class aquarium:
             }
         
         import RPi.GPIO as GPIO
+        GPIO.setmode(GPIO.BCM)
         self.pinsIn = {
-            5 : {'name' : 'lvlEN', 'pinType': 'levelSensor', 'state' : GPIO.input(5)},
-            6 : {'name' : 'wastelvl', 'pinType': 'levelSensor', 'state' : GPIO.input(6)},
-            13 : {'name' : 'cleanlvl', 'pinType': 'levelSensor', 'state' : GPIO.input(13)},
-            19 : {'name' : 'aqualvl', 'pinType': 'levelSensor', 'state' : GPIO.input(19)},
-            26 : {'name' : 'sparelvl', 'pinType': 'levelSensor', 'state' : GPIO.input(26)},
-            17 : {'name' : 'FAULTn1', 'pinType': 'motor', 'state' : GPIO.input(17)},
-            27 : {'name' : 'FAULTn2', 'pinType': 'motor', 'state' : GPIO.input(27)},
-            22 : {'name' : 'FAULTn3', 'pinType': 'motor', 'state' : GPIO.input(22)},
-            23 : {'name' : 'buttonSig', 'pinType': 'interface', 'state' : GPIO.input(23)},
+            5 : {'name' : 'lvlEN', 'pinType': 'levelSensor', 'state' : 0},
+            6 : {'name' : 'wastelvl', 'pinType': 'levelSensor', 'state' : 0},
+            13 : {'name' : 'cleanlvl', 'pinType': 'levelSensor', 'state' : 0},
+            19 : {'name' : 'aqualvl', 'pinType': 'levelSensor', 'state' : 0},
+            26 : {'name' : 'sparelvl', 'pinType': 'levelSensor', 'state' : 0},
+            17 : {'name' : 'FAULTn1', 'pinType': 'motor', 'state' : 0},
+            27 : {'name' : 'FAULTn2', 'pinType': 'motor', 'state' : 0},
+            22 : {'name' : 'FAULTn3', 'pinType': 'motor', 'state' : 0},
+            23 : {'name' : 'buttonSig', 'pinType': 'interface', 'state' : 0},
         }
         self.pinsOut = {
             #24 : {'name' : 'I2C RST', 'state' : 0},
@@ -52,6 +53,7 @@ class aquarium:
                 GPIO.setup(pin, GPIO.OUT, initial = GPIO.LOW)
             for pin in self.pinsIn:
                 GPIO.setup(pin, GPIO.IN)
+                pin['state'] = GPIO.input(pin)
                 GPIO.add_event_detect(pin, GPIO.FALLING, callback=self.buttonPress, bouncetime=10) 
         except:
             return 'Error trying to setup GPIO pins'
