@@ -92,9 +92,9 @@ class aquarium:
         #GPIO.add_event_detect(channel, GPIO.RISING, callback=my_callback, bouncetime=200)
         print('hi')
 
-    def motorControl(self, name, i2cAddress=0x60, speed=1, direction='forward'):
+    def motorControl(self, name='drv0', i2cAddress=0x60, speed=1, direction='forward'):
         voltage = 5 * int(speed)
-        if name == drv0:
+        if name == 'drv0':
             self.drv0.set_direction(direction)
             self.drv0.set_voltage(voltage)
             print("Setting to direction " + direction + " " + str(voltage))
