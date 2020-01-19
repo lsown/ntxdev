@@ -79,13 +79,13 @@ class aquarium:
         if self.pinsIn[23]['priorState'] == 0:
             GPIO.output(self.pinsOut['LEDPwr']['pin'], 1)
             self.pinsIn[23]['priorState'] = 1
-            self.display.drawStatus(text1='pumping', text2=('temp: ' + str(self.get_temp())
+            self.display.drawStatus(text1='pumping', text2=('temp: ' + str(self.get_temp())))
             self.motorControl(name='drv0', speed = 1, direction = 'forward')
         else:
             GPIO.output(self.pinsOut['LEDPwr']['pin'], 0)
             self.pinsIn[23]['priorState'] = 0
             self.motorControl(name='drv0', speed = 1, direction = 'brake')
-            self.display.drawStatus(text1='idle', text2=('temp: ' + str(self.get_temp())
+            self.display.drawStatus(text1='idle', text2=('temp: ' + str(self.get_temp())))
         print('LED state changed to ' + str(self.pinsIn[23]['priorState']))
 
     def levelSensor(self, channel):
