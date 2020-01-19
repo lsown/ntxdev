@@ -8,8 +8,8 @@ from datetime import datetime
 from RPi import GPIO as GPIO
 GPIO.setmode(GPIO.BCM)
 
-import drv8830 #motor
-#This class instantiates several versions
+import drv8830 #motor drive library
+import i2cdisplay
 
 #level sensors - signal goes HIGH when water detected
 #motor fault pins - need to configure for pullup, these go low when fault detected
@@ -50,6 +50,7 @@ class aquarium:
         self.piSetup()
         
         self.drv0 = drv8830.DRV8830()
+        self.display = i2cdisplay.display() #creates a display object
 
     def piSetup(self): #Sets up GPIO pins, can also add to GPIO.in <pull_up_down=GPIO.PUD_UP>
 
@@ -78,9 +79,13 @@ class aquarium:
         if self.pinsIn[23]['priorState'] == 0:
             GPIO.output(self.pinsOut['LEDPwr']['pin'], 1)
             self.pinsIn[23]['priorState'] = 1
+            self.display('pumping')
+            self.motorControl(name='drv0', speed = 1, direction = 'forward')
         else:
             GPIO.output(self.pinsOut['LEDPwr']['pin'], 0)
             self.pinsIn[23]['priorState'] = 0
+            self.motorControl(name='drv0', speed = 1, direction = 'brake')
+            self.display('idle')
         print('LED state changed to ' + str(self.pinsIn[23]['priorState']))
 
     def levelSensor(self, channel):
