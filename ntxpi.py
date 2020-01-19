@@ -54,7 +54,7 @@ class aquarium:
     def piSetup(self): #Sets up GPIO pins, can also add to GPIO.in <pull_up_down=GPIO.PUD_UP>
 
         for pin in self.pinsOut:
-            GPIO.setup([pin]['pin'], GPIO.OUT, initial = GPIO.LOW)
+            GPIO.setup(self.pinsOut[pin]['pin'], GPIO.OUT, initial = GPIO.LOW)
             print('0')
         for pin in self.pinsIn:
             GPIO.setup(pin, GPIO.IN)
