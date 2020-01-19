@@ -68,7 +68,7 @@ class aquarium:
                 GPIO.add_event_detect(pin, GPIO.FALLING, callback=self.motorFault, bouncetime=10) 
                 print(str(pin) + 'set as motor callback')
             elif self.pinsIn[pin]['pinType'] == 'interface':
-                GPIO.add_event_detect(pin, GPIO.RISING, callback=self.buttonPress, bouncetime=10) 
+                GPIO.add_event_detect(pin, GPIO.RISING, callback=self.buttonPress, bouncetime=200) 
                 print(str(pin) + 'set as button callback')
             print(str(pin) + 'passed 3')
 
