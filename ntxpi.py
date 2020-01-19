@@ -16,11 +16,12 @@ class aquarium:
         self.aquariumID = 100
         import onewiretemp as onewiretemp
         self.aqtemp = onewiretemp.onewiretemp() #creates an temp object
+        '''
         self.pinsIn = {
             5 : {'name' : 'lvlEN', 'pinType': 'levelSensor', 'state' : 1},
             6 : {'name' : 'wastelvl', 'pinType': 'levelSensor', 'state' : 0}
             }
-        
+        '''
         import RPi.GPIO as GPIO
         GPIO.setmode(GPIO.BCM)
         self.pinsIn = {
@@ -39,9 +40,9 @@ class aquarium:
             18 : {'name' : 'LEDPwr', 'state' : 0} 
         }
         self.motors = {
-            drv1 : {'name' : 'aqPump', 'i2cAddress' : 0x60, 'voltage' : 0, 'direction' : 'cw'},
-            drv2 : {'name' : 'wastePump', 'i2cAddress' : 0x61, 'voltage' : 0, 'direction' : 'cw'},
-            drv3 : {'name' : 'sparePump', 'i2cAddress' : 0x62, 'voltage' : 0, 'direction' : 'cw'}
+            'drv1' : {'name' : 'aqPump', 'i2cAddress' : 0x60, 'voltage' : 0, 'direction' : 'cw'},
+            'drv2' : {'name' : 'wastePump', 'i2cAddress' : 0x61, 'voltage' : 0, 'direction' : 'cw'},
+            'drv3' : {'name' : 'sparePump', 'i2cAddress' : 0x62, 'voltage' : 0, 'direction' : 'cw'}
         }
         self.piSetup()
         
