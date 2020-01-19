@@ -79,7 +79,7 @@ class aquarium:
             print('cleanlvl went high')
         elif self.pinsIn[channel]['name'] == 'aqualvl':
             print('aqualvl went high')
-        elif self.pinsIn[channel]['name'] == 'sparelvl'
+        elif self.pinsIn[channel]['name'] == 'sparelvl':
             print('sparelvl went high')
 
 
