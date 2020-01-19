@@ -13,7 +13,7 @@ class display:
 		self.i2c = board.I2C()
 		self.oled = adafruit_ssd1306.SSD1306_I2C(self.WIDTH, self.HEIGHT, self.i2c, addr=0x3c) #reset taken out
 
-	def drawStatus(self, text1):
+	def drawStatus(self, text1, text2):
 		self.oled.fill(0)
 		self.oled.show()
 
@@ -37,6 +37,11 @@ class display:
 		text1 = text1
 		(font_width, font_height) = font.getsize(text1)
 		draw.text((self.oled.width//2 - font_width//2, self.oled.height//2 - font_height//2), text1, font=font, fill=255)
+
+		text2 = text2
+		(font_width, font_height) = font.getsize(text1)
+		draw.text((self.oled.width//4 - font_width//2, self.oled.height//4 - font_height//2), text2, font=font, fill=255)
+
 
 		# Display image
 		self.oled.image(image)
