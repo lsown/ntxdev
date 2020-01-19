@@ -43,9 +43,9 @@ class aquarium:
             'LEDPwr' : {'name' : 'LEDPwr', 'state' : 0, 'pin' : 18} 
         }
         self.motors = {
-            'drv0' : {'name' : 'aqPump', 'i2cAddress' : 0x60, 'speed' : 0, 'direction' : 'cw'},
-            'drv1' : {'name' : 'wastePump', 'i2cAddress' : 0x61, 'speed' : 0, 'direction' : 'cw'},
-            'drv2' : {'name' : 'sparePump', 'i2cAddress' : 0x62, 'speed' : 0, 'direction' : 'cw'}
+            'drv0' : {'name' : 'aqPump', 'i2cAddress' : 0x60, 'speed' : 0, 'direction' : 'cw', 'faultpin' : 17},
+            'drv1' : {'name' : 'wastePump', 'i2cAddress' : 0x61, 'speed' : 0, 'direction' : 'cw', 'faultpin' : 27},
+            'drv2' : {'name' : 'sparePump', 'i2cAddress' : 0x62, 'speed' : 0, 'direction' : 'cw', 'faultpin': 22}
         }
         self.piSetup()
         
@@ -101,7 +101,9 @@ class aquarium:
 
     def motorFault(self, channel):
         #GPIO.add_event_detect(channel, GPIO.RISING, callback=my_callback, bouncetime=200)
-        print('hi')
+        for i in self.motors:
+            if self.motors[i]['faultpin'] == channel
+                print(i + "has tripped a fault")
 
     def motorControl(self, name='drv0', i2cAddress=0x60, speed=1, direction='forward'):
         if speed > 1:
