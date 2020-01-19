@@ -7,7 +7,7 @@ from datetime import datetime
 #Rpi related objects
 
 import RPi.GPIO as GPIO
-
+GPIO.setmode(GPIO.BCM)
 #This class instantiates several versions
 
 class aquarium:
@@ -22,8 +22,6 @@ class aquarium:
             6 : {'name' : 'wastelvl', 'pinType': 'levelSensor', 'state' : 0}
             }
         '''
-
-        GPIO.setmode(GPIO.BCM)
         self.pinsIn = {
             5 : {'name' : 'lvlEN', 'pinType': 'levelSensor', 'state' : 0},
             6 : {'name' : 'wastelvl', 'pinType': 'levelSensor', 'state' : 0},
@@ -49,7 +47,6 @@ class aquarium:
 
     def piSetup(self): #Sets up GPIO pins, can also add to GPIO.in <pull_up_down=GPIO.PUD_UP>
         try:
-            GPIO.setmode(GPIO.BCM)
             for pin in self.pinsOut:
                 GPIO.setup(pin, GPIO.OUT, initial = GPIO.LOW)
             for pin in self.pinsIn:
