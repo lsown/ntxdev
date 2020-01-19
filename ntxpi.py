@@ -6,7 +6,7 @@ from datetime import datetime
 
 #Rpi related objects
 
-import RPi.GPIO as GPIO
+from RPi import GPIO as GPIO
 GPIO.setmode(GPIO.BCM)
 #This class instantiates several versions
 
@@ -46,18 +46,16 @@ class aquarium:
         
 
     def piSetup(self): #Sets up GPIO pins, can also add to GPIO.in <pull_up_down=GPIO.PUD_UP>
-        try:
-            for pin in self.pinsOut:
-                GPIO.setup(pin, GPIO.OUT, initial = GPIO.LOW)
-                print('0')
-            for pin in self.pinsIn:
-                GPIO.setup(pin, GPIO.IN)
-                print(str(pin) + 'passed 1')
-                x[pin]['state'] = GPIO.input(pin)
-                print(str(pin) + 'passed 2')
-                GPIO.add_event_detect(pin, GPIO.FALLING, callback=self.buttonPress, bouncetime=10) 
-        except:
-            return 'Error trying to setup GPIO pins'
+
+        for pin in self.pinsOut:
+            GPIO.setup(pin, GPIO.OUT, initial = GPIO.LOW)
+            print('0')
+        for pin in self.pinsIn:
+            GPIO.setup(pin, GPIO.IN)
+            print(str(pin) + ' passed 1')
+            x[pin]['state'] = GPIO.input(pin)
+            print(str(pin) + 'passed 2')
+            GPIO.add_event_detect(pin, GPIO.FALLING, callback=self.buttonPress, bouncetime=10) 
 
     def buttonPress(self):
         #GPIO.add_event_detect(channel, GPIO.RISING, callback=my_callback, bouncetime=200)
