@@ -49,9 +49,12 @@ class aquarium:
         try:
             for pin in self.pinsOut:
                 GPIO.setup(pin, GPIO.OUT, initial = GPIO.LOW)
+                print('0')
             for pin in self.pinsIn:
                 GPIO.setup(pin, GPIO.IN)
+                print('1')
                 x[pin]['state'] = GPIO.input(pin)
+                print('2')
                 GPIO.add_event_detect(pin, GPIO.FALLING, callback=self.buttonPress, bouncetime=10) 
         except:
             return 'Error trying to setup GPIO pins'
