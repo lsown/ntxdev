@@ -102,7 +102,7 @@ class aquarium:
     def motorFault(self, channel):
         #GPIO.add_event_detect(channel, GPIO.RISING, callback=my_callback, bouncetime=200)
         for i in self.motors:
-            if self.motors[i]['faultpin'] == channel
+            if self.motors[i]['faultpin'] == channel:
                 print(i + "has tripped a fault")
 
     def motorControl(self, name='drv0', i2cAddress=0x60, speed=1, direction='forward'):
