@@ -55,10 +55,27 @@ class aquarium:
             print(str(pin) + ' passed 1')
             self.pinsIn[pin]['state'] = GPIO.input(pin)
             print(str(pin) + 'passed 2')
-            GPIO.add_event_detect(pin, GPIO.FALLING, callback=self.buttonPress, bouncetime=10) 
+            if self.pinsIn[pin]['pinType'] == 'levelSensor':
+                GPIO.add_event_detect(pin, GPIO.FALLING, callback=self.levelSensor, bouncetime=10) 
+                print(str(pin) + 'set as levelSensor callback')
+            elif self.pinsIn[pin]['pinType'] == 'motor':
+                GPIO.add_event_detect(pin, GPIO.FALLING, callback=self.motorFault, bouncetime=10) 
+                print(str(pin) + 'set as motor callback')
+            elif self.pinsIn[pin]['pinType'] == 'interface':
+                GPIO.add_event_detect(pin, GPIO.FALLING, callback=self.buttonPress, bouncetime=10) 
+                print(str(pin) + 'set as button callback')
             print(str(pin) + 'passed 3')
 
     def buttonPress(self, channel):
+        #GPIO.add_event_detect(channel, GPIO.RISING, callback=my_callback, bouncetime=200)
+        print('hi')
+        print(str(channel))
+
+    def levelSensor(self, channel):
+        #GPIO.add_event_detect(channel, GPIO.RISING, callback=my_callback, bouncetime=200)
+        
+
+    def motorFault(self, channel):
         #GPIO.add_event_detect(channel, GPIO.RISING, callback=my_callback, bouncetime=200)
         print('hi')
 
