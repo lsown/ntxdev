@@ -5,9 +5,10 @@ import time
 from datetime import datetime
 
 #Rpi related objects
-
 from RPi import GPIO as GPIO
 GPIO.setmode(GPIO.BCM)
+
+import drv8830 #motor
 #This class instantiates several versions
 
 #level sensors - signal goes HIGH when water detected
@@ -42,12 +43,13 @@ class aquarium:
             18 : {'name' : 'LEDPwr', 'state' : 0} 
         }
         self.motors = {
-            'drv1' : {'name' : 'aqPump', 'i2cAddress' : 0x60, 'voltage' : 0, 'direction' : 'cw'},
-            'drv2' : {'name' : 'wastePump', 'i2cAddress' : 0x61, 'voltage' : 0, 'direction' : 'cw'},
-            'drv3' : {'name' : 'sparePump', 'i2cAddress' : 0x62, 'voltage' : 0, 'direction' : 'cw'}
+            'drv0' : {'name' : 'aqPump', 'i2cAddress' : 0x60, 'speed' : 0, 'direction' : 'cw'},
+            'drv1' : {'name' : 'wastePump', 'i2cAddress' : 0x61, 'speed' : 0, 'direction' : 'cw'},
+            'drv2' : {'name' : 'sparePump', 'i2cAddress' : 0x62, 'speed' : 0, 'direction' : 'cw'}
         }
         self.piSetup()
         
+        self.drv0 = drv8830.DRV8830()
 
     def piSetup(self): #Sets up GPIO pins, can also add to GPIO.in <pull_up_down=GPIO.PUD_UP>
 
@@ -66,7 +68,7 @@ class aquarium:
                 GPIO.add_event_detect(pin, GPIO.FALLING, callback=self.motorFault, bouncetime=10) 
                 print(str(pin) + 'set as motor callback')
             elif self.pinsIn[pin]['pinType'] == 'interface':
-                GPIO.add_event_detect(pin, GPIO.RISING, callback=self.buttonPress, bouncetime=100) 
+                GPIO.add_event_detect(pin, GPIO.RISING, callback=self.buttonPress, bouncetime=10) 
                 print(str(pin) + 'set as button callback')
             print(str(pin) + 'passed 3')
 
@@ -86,10 +88,16 @@ class aquarium:
         elif self.pinsIn[channel]['name'] == 'sparelvl':
             print('sparelvl went high')
 
-
     def motorFault(self, channel):
         #GPIO.add_event_detect(channel, GPIO.RISING, callback=my_callback, bouncetime=200)
         print('hi')
+
+    def motorControl(self, name, i2cAddress=0x60, speed=1, direction='forward'):
+        voltage = 5 * int(speed)
+        if name == drv0:
+            self.drv0.set_direction(direction)
+            self.drv0.set_voltage(voltage)
+            print("Setting to direction " + direction + " " + str(voltage))
 
     def stateMonitor(self):
         #detects if level sensors have gone high
