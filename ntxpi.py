@@ -6,7 +6,7 @@ from datetime import datetime
 
 #Rpi related objects
 
-#import RPi.GPIO as GPIO
+import RPi.GPIO as GPIO
 
 #This class instantiates several versions
 
@@ -22,7 +22,7 @@ class aquarium:
             6 : {'name' : 'wastelvl', 'pinType': 'levelSensor', 'state' : 0}
             }
         '''
-        import RPi.GPIO as GPIO
+
         GPIO.setmode(GPIO.BCM)
         self.pinsIn = {
             5 : {'name' : 'lvlEN', 'pinType': 'levelSensor', 'state' : 0},
@@ -54,7 +54,7 @@ class aquarium:
                 GPIO.setup(pin, GPIO.OUT, initial = GPIO.LOW)
             for pin in self.pinsIn:
                 GPIO.setup(pin, GPIO.IN)
-                pin['state'] = GPIO.input(pin)
+                x[pin]['state'] = GPIO.input(pin)
                 GPIO.add_event_detect(pin, GPIO.FALLING, callback=self.buttonPress, bouncetime=10) 
         except:
             return 'Error trying to setup GPIO pins'
