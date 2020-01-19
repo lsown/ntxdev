@@ -40,7 +40,8 @@ def index():
 	aquarium = ntxpi.aquarium()
 #	aqdict = {'a': 23,'b':50, 'c':30} #testercode
 	aqdict = aquarium.get_status() #returns a dictionary
-	return render_template('index.html', aqdict = aqdict)
+	pinstatus = aquarium.pinsIn
+	return render_template('index.html', aqdict = aqdict, pinstatus = pinstatus)
 
 @app.route('/onewire')
 def onewire():
