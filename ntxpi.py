@@ -36,7 +36,7 @@ class aquarium:
             17 : {'name' : 'FAULTn1', 'pinType': 'motor', 'state' : 0},
             27 : {'name' : 'FAULTn2', 'pinType': 'motor', 'state' : 0},
             22 : {'name' : 'FAULTn3', 'pinType': 'motor', 'state' : 0},
-            23 : {'name' : 'buttonSig', 'pinType': 'interface', 'state' : 0},
+            23 : {'name' : 'buttonSig', 'pinType': 'interface', 'state' : 0, 'priorState' : 0},
         }
         self.pinsOut = {
             #24 : {'name' : 'I2C RST', 'state' : 0},
@@ -75,10 +75,13 @@ class aquarium:
     def buttonPress(self, channel):
         #GPIO.add_event_detect(channel, GPIO.RISING, callback=my_callback, bouncetime=200)
         print('button')
-        GPIO.output(self.pinsOut['LEDPwr']['pin'], 1)
-        time.sleep(1000)
-        GPIO.output(self.pinsOut['LEDPwr']['pin'], 0)
-        print(channel)
+        if self.pinsIn[23]['priorState'] == 0:
+            GPIO.output(self.pinsOut['LEDPwr']['pin'], 1)
+            self.pinsIn[23]['priorState'] = 1
+        else:
+            GPIO.output(self.pinsOut['LEDPwr']['pin'], 0)
+            self.pinsIn[23]['priorState'] = 0
+        print('LED state changed to ' + str(self.pinsIn[23]['priorState']))
 
     def levelSensor(self, channel):
         #GPIO.add_event_detect(channel, GPIO.RISING, callback=my_callback, bouncetime=200)
