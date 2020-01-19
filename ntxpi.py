@@ -56,8 +56,9 @@ class aquarium:
             self.pinsIn[pin]['state'] = GPIO.input(pin)
             print(str(pin) + 'passed 2')
             GPIO.add_event_detect(pin, GPIO.FALLING, callback=self.buttonPress, bouncetime=10) 
+            print(str(pin) + 'passed 3')
 
-    def buttonPress(self):
+    def buttonPress(self, channel):
         #GPIO.add_event_detect(channel, GPIO.RISING, callback=my_callback, bouncetime=200)
         print('hi')
 
