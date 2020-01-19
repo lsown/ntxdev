@@ -27,7 +27,7 @@ print("GPIO port 25 (pin 22) to GND (pin 6) through a ~1k resistor\n")
   
 print("Also put a 100 nF capacitor across your switch for hardware debouncing") 
 print("This is necessary to see the effect we're looking for")  
-raw_input("Press Enter when ready\n>")  
+input("Press Enter when ready\n>")  
   
 try:  
 	print("When pressed, you'll see: Rising Edge detected on 25") 
