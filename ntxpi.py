@@ -10,6 +10,10 @@ from RPi import GPIO as GPIO
 GPIO.setmode(GPIO.BCM)
 #This class instantiates several versions
 
+#level sensors - signal goes HIGH when water detected
+#motor fault pins - need to configure for pullup, these go low when fault detected
+#button - we may want to add 0.1 uF to c7. Hi when button depressed.
+
 class aquarium:
     def __init__(self):
         
@@ -56,13 +60,13 @@ class aquarium:
             self.pinsIn[pin]['state'] = GPIO.input(pin)
             print(str(pin) + 'passed 2')
             if self.pinsIn[pin]['pinType'] == 'levelSensor':
-                GPIO.add_event_detect(pin, GPIO.FALLING, callback=self.levelSensor, bouncetime=10) 
+                GPIO.add_event_detect(pin, GPIO.RISING, callback=self.levelSensor, bouncetime=10) 
                 print(str(pin) + 'set as levelSensor callback')
             elif self.pinsIn[pin]['pinType'] == 'motor':
                 GPIO.add_event_detect(pin, GPIO.FALLING, callback=self.motorFault, bouncetime=10) 
                 print(str(pin) + 'set as motor callback')
             elif self.pinsIn[pin]['pinType'] == 'interface':
-                GPIO.add_event_detect(pin, GPIO.FALLING, callback=self.buttonPress, bouncetime=10) 
+                GPIO.add_event_detect(pin, GPIO.RISING, callback=self.buttonPress, bouncetime=100) 
                 print(str(pin) + 'set as button callback')
             print(str(pin) + 'passed 3')
 
