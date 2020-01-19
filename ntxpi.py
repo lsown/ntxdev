@@ -93,7 +93,7 @@ class aquarium:
         print('hi')
 
     def motorControl(self, name='drv0', i2cAddress=0x60, speed=1, direction='forward'):
-        voltage = 5 * int(speed)
+        voltage = (2 * float(speed)) + 3
         if name == 'drv0':
             self.drv0.set_direction(direction)
             self.drv0.set_voltage(voltage)
