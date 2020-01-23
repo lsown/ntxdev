@@ -109,10 +109,10 @@ class aquarium:
         if speed > 1:
             speed = 1
         voltage = (2 * float(speed)) + 3 #looks like min. speed of our pump is 3V
-        if name == name:
-            self.name.set_direction(direction)
-            self.name.set_voltage(voltage)
-            print("Setting to direction " + direction + " " + str(voltage))
+        #if name == name:
+        name.set_direction(direction)
+        name.set_voltage(voltage)
+        print("Setting to direction " + direction + " " + str(voltage))
 
     def stateMonitor(self):
         #detects if level sensors have gone high
