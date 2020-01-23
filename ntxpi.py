@@ -28,7 +28,7 @@ class aquarium:
             }
         '''
         self.pinsIn = {
-            5 : {'name' : 'lvlEN', 'pinType': 'levelSensor', 'state' : 0},
+            #5 : {'name' : 'lvlEN', 'pinType': 'levelSensor', 'state' : 0},
             6 : {'name' : 'wastelvl', 'pinType': 'levelSensor', 'state' : 0},
             13 : {'name' : 'cleanlvl', 'pinType': 'levelSensor', 'state' : 0},
             19 : {'name' : 'aqualvl', 'pinType': 'levelSensor', 'state' : 0},
@@ -43,8 +43,8 @@ class aquarium:
             'LEDPwr' : {'name' : 'LEDPwr', 'state' : 0, 'pin' : 18} 
         }
         self.motors = {
-            'drv0' : {'name' : 'aqPump', 'i2cAddress' : 0x60, 'speed' : 0, 'direction' : 'cw', 'faultpin' : 17},
-            'drv1' : {'name' : 'wastePump', 'i2cAddress' : 0x61, 'speed' : 0, 'direction' : 'cw', 'faultpin' : 27},
+            'drv0' : {'name' : 'wastePump', 'i2cAddress' : 0x60, 'speed' : 0, 'direction' : 'cw', 'faultpin' : 17},
+            'drv1' : {'name' : 'containerPump', 'i2cAddress' : 0x61, 'speed' : 0, 'direction' : 'cw', 'faultpin' : 27},
             #'drv2' : {'name' : 'sparePump', 'i2cAddress' : 0x62, 'speed' : 0, 'direction' : 'cw', 'faultpin': 22}
         }
         self.piSetup()
@@ -100,7 +100,9 @@ class aquarium:
         elif self.pinsIn[channel]['name'] == 'cleanlvl':
             print('cleanlvl went high')
         elif self.pinsIn[channel]['name'] == 'aqualvl':
-            print('aqualvl went high')
+            print('aqualvl went high, turning off motors')
+            self.motorControl(name='drv0', speed=0, direction = 'brake')
+            self.display.drawStatus(text1='Aqua Hi', text2=('temp: ' + str(self.get_temp())))
         elif self.pinsIn[channel]['name'] == 'sparelvl':
             print('sparelvl went high')
 
