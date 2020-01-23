@@ -85,11 +85,11 @@ class aquarium:
             GPIO.output(self.pinsOut['LEDPwr']['pin'], 1)
             self.pinsIn[23]['priorState'] = 1
             self.display.drawStatus(text1='pumping', text2=('temp: ' + str(self.get_temp())))
-            self.motorControl(name=self.drv0, speed = 1, direction = 'forward')
+            self.motorControl(name='drv0', speed = 1, direction = 'forward')
         else:
             GPIO.output(self.pinsOut['LEDPwr']['pin'], 0)
             self.pinsIn[23]['priorState'] = 0
-            self.motorControl(name=self.drv0, speed = 1, direction = 'brake')
+            self.motorControl(name='drv0', speed = 1, direction = 'brake')
             self.display.drawStatus(text1='idle', text2=('temp: ' + str(self.get_temp())))
         print('LED state changed to ' + str(self.pinsIn[23]['priorState']))
 
@@ -110,14 +110,25 @@ class aquarium:
             if self.motors[i]['faultpin'] == channel:
                 print(i + "has tripped a fault")
 
-    def motorControl(self, motor=self.drv0, i2cAddress=0x60, speed=1, direction='forward'):
+    def motorControl(self, name='drv0', i2cAddress=0x60, speed=1, direction='forward'):
         if speed > 1:
             speed = 1
         voltage = (2 * float(speed)) + 3 #looks like min. speed of our pump is 3V
-        #if name == name:
-        motor.set_direction(direction)
-        motor.set_voltage(voltage)
-        print("Setting to direction " + direction + " " + str(voltage))
+
+        if name == 'drv0':
+            self.drv0.set_direction(direction)
+            self.drv0.set_voltage(voltage)
+            print("Setting direction " + name + " " + direction + " " + str(voltage))
+
+        if name == 'drv1':
+            self.drv1.set_direction(direction)
+            self.drv1.set_voltage(voltage)
+            print("Setting direction " + direction + " " + str(voltage))
+
+        if name == 'drv2':
+            self.drv2.set_direction(direction)
+            self.drv2.set_voltage(voltage)
+            print("Setting direction " + direction + " " + str(voltage))
 
     def stateMonitor(self):
         #detects if level sensors have gone high
