@@ -30,8 +30,8 @@ class aquarium:
         self.pinsIn = {
             #5 : {'name' : 'lvlEN', 'pinType': 'levelSensor', 'state' : 0},
             6 : {'name' : 'wastelvl', 'pinType': 'levelSensor', 'state' : 0},
-            13 : {'name' : 'cleanlvl', 'pinType': 'levelSensor', 'state' : 0},
-            19 : {'name' : 'aqualvl', 'pinType': 'levelSensor', 'state' : 0},
+            19 : {'name' : 'cleanlvl', 'pinType': 'levelSensor', 'state' : 0},
+            13 : {'name' : 'aqualvl', 'pinType': 'levelSensor', 'state' : 0},
             26 : {'name' : 'sparelvl', 'pinType': 'levelSensor', 'state' : 0},
             17 : {'name' : 'FAULTn1', 'pinType': 'motor', 'state' : 0},
             27 : {'name' : 'FAULTn2', 'pinType': 'motor', 'state' : 0},
