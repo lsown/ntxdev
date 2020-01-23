@@ -45,7 +45,7 @@ class aquarium:
         self.motors = {
             'drv0' : {'name' : 'aqPump', 'i2cAddress' : 0x60, 'speed' : 0, 'direction' : 'cw', 'faultpin' : 17},
             'drv1' : {'name' : 'wastePump', 'i2cAddress' : 0x61, 'speed' : 0, 'direction' : 'cw', 'faultpin' : 27},
-            'drv2' : {'name' : 'sparePump', 'i2cAddress' : 0x62, 'speed' : 0, 'direction' : 'cw', 'faultpin': 22}
+            #'drv2' : {'name' : 'sparePump', 'i2cAddress' : 0x62, 'speed' : 0, 'direction' : 'cw', 'faultpin': 22}
         }
         self.piSetup()
         self.motorSetup()
@@ -76,7 +76,7 @@ class aquarium:
     def motorSetup(self):
         self.drv0 = drv8830.DRV8830(i2c_addr=0x60)
         self.drv1 = drv8830.DRV8830(i2c_addr=0x61)
-        self.drv2 = drv8830.DRV8830(i2c_addr=0x62)
+        #self.drv2 = drv8830.DRV8830(i2c_addr=0x62) #note, change HW to 0x63 to work with library
 
     def buttonPress(self, channel):
         #GPIO.add_event_detect(channel, GPIO.RISING, callback=my_callback, bouncetime=200)
@@ -123,11 +123,6 @@ class aquarium:
         if name == 'drv1':
             self.drv1.set_direction(direction)
             self.drv1.set_voltage(voltage)
-            print("Setting direction " + direction + " " + str(voltage))
-
-        if name == 'drv2':
-            self.drv2.set_direction(direction)
-            self.drv2.set_voltage(voltage)
             print("Setting direction " + direction + " " + str(voltage))
 
     def stateMonitor(self):
