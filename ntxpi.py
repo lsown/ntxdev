@@ -48,8 +48,8 @@ class aquarium:
             'drv2' : {'name' : 'sparePump', 'i2cAddress' : 0x62, 'speed' : 0, 'direction' : 'cw', 'faultpin': 22}
         }
         self.piSetup()
-        
-        self.drv0 = drv8830.DRV8830()
+        self.motorSetup()
+
         self.display = i2cdisplay.display() #creates a display object
 
     def piSetup(self): #Sets up GPIO pins, can also add to GPIO.in <pull_up_down=GPIO.PUD_UP>
@@ -73,6 +73,11 @@ class aquarium:
                 print(str(pin) + 'set as button callback')
             print(str(pin) + 'passed 3')
 
+    def motorSetup(self):
+        self.drv0 = drv8830.DRV8830(i2c_addr=0x60)
+        self.drv1 = drv8830.DRV8830(i2c_addr=0x61)
+        self.drv2 = drv8830.DRV8830(i2c_addr=0x62)
+
     def buttonPress(self, channel):
         #GPIO.add_event_detect(channel, GPIO.RISING, callback=my_callback, bouncetime=200)
         print('button')
@@ -80,11 +85,11 @@ class aquarium:
             GPIO.output(self.pinsOut['LEDPwr']['pin'], 1)
             self.pinsIn[23]['priorState'] = 1
             self.display.drawStatus(text1='pumping', text2=('temp: ' + str(self.get_temp())))
-            self.motorControl(name='drv0', speed = 1, direction = 'forward')
+            self.motorControl(name=self.drv0, speed = 1, direction = 'forward')
         else:
             GPIO.output(self.pinsOut['LEDPwr']['pin'], 0)
             self.pinsIn[23]['priorState'] = 0
-            self.motorControl(name='drv0', speed = 1, direction = 'brake')
+            self.motorControl(name=self.drv0, speed = 1, direction = 'brake')
             self.display.drawStatus(text1='idle', text2=('temp: ' + str(self.get_temp())))
         print('LED state changed to ' + str(self.pinsIn[23]['priorState']))
 
@@ -105,13 +110,13 @@ class aquarium:
             if self.motors[i]['faultpin'] == channel:
                 print(i + "has tripped a fault")
 
-    def motorControl(self, name='drv0', i2cAddress=0x60, speed=1, direction='forward'):
+    def motorControl(self, motor=self.drv0, i2cAddress=0x60, speed=1, direction='forward'):
         if speed > 1:
             speed = 1
         voltage = (2 * float(speed)) + 3 #looks like min. speed of our pump is 3V
         #if name == name:
-        name.set_direction(direction)
-        name.set_voltage(voltage)
+        motor.set_direction(direction)
+        motor.set_voltage(voltage)
         print("Setting to direction " + direction + " " + str(voltage))
 
     def stateMonitor(self):
