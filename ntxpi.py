@@ -71,7 +71,7 @@ class aquarium:
                 GPIO.add_event_detect(pin, GPIO.FALLING, callback=self.motorFault, bouncetime=100) 
                 print(str(pin) + 'set as motor callback')
             elif self.pinsIn[pin]['pinType'] == 'interface':
-                GPIO.add_event_detect(pin, GPIO.RISING, callback=self.buttonPress, bouncetime=200) 
+                GPIO.add_event_detect(pin, GPIO.BOTH, callback=self.buttonPress, bouncetime=200) 
                 print(str(pin) + 'set as button callback')
             print(str(pin) + 'passed 3')
 
@@ -81,23 +81,23 @@ class aquarium:
         #self.drv2 = drv8830.DRV8830(i2c_addr=0x62) #note, change HW to 0x63 to work with library
 
     def buttonPress(self, channel):
-        #GPIO.add_event_detect(channel, GPIO.RISING, callback=my_callback, bouncetime=200)
-        print('button')
-        if self.pinsIn[23]['priorState'] == 0:
+        print('button press detected: ' + 'prior state was ' + str(self.pinsIn[channel]['priorState']))
+        self.pinsIn[channel]['state'] = GPIO.input(channel) #set state to 1
+        if self.pinsIn[channel]['priorState'] == 0:
             GPIO.output(self.pinsOut['LEDPwr']['pin'], 1)
-            self.pinsIn[23]['priorState'] = 1
+            self.pinsIn[channel]['priorState'] = 1
             self.display.drawStatus(text1='pumping', text2=('temp: ' + str(self.get_temp())))
             self.motorControl(name='drv0', speed = 1, direction = 'forward')
         else:
             GPIO.output(self.pinsOut['LEDPwr']['pin'], 0)
-            self.pinsIn[23]['priorState'] = 0
+            self.pinsIn[channel]['priorState'] = 0
             self.motorControl(name='drv0', speed = 1, direction = 'brake')
             self.display.drawStatus(text1='idle', text2=('temp: ' + str(self.get_temp())))
-        print('LED state changed to ' + str(self.pinsIn[23]['priorState']))
+        print('LED state changed to ' + str(self.pinsIn[channel]['priorState']))
 
     def levelSensor(self, channel):
         #GPIO.add_event_detect(channel, GPIO.RISING, callback=my_callback, bouncetime=200)
-        self.pinsIn[channel]['state'] = GPIO.input(channel) #set indicator to 1
+        self.pinsIn[channel]['state'] = GPIO.input(channel) #set state to 1
         if self.pinsIn[channel]['state'] == 1:
             print("pin state set to" + str(self.pinsIn[channel]['state'])) # debug
             if self.pinsIn[channel]['name'] == 'wastelvl':
