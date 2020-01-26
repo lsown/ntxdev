@@ -22,6 +22,9 @@ moment = Moment(app)
 #db = SQLAlchemy(app)
 #migrate = Migrate(app, db)
 
+aquarium = ntxpi.aquarium()
+
+
 @app.shell_context_processor
 def make_shell_context():
     return dict(db=db, User=User, Role=Role)
@@ -37,7 +40,6 @@ def internal_server_error(e):
 
 @app.route('/')
 def index():
-	aquarium = ntxpi.aquarium()
 #	aqdict = {'a': 23,'b':50, 'c':30} #testercode
 	aqdict = aquarium.get_status() #returns a dictionary
 	pinstatus = aquarium.pinsIn
