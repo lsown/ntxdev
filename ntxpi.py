@@ -65,8 +65,7 @@ class aquarium:
             print(str(pin) + 'passed 2')
 
             if self.pinsIn[pin]['pinType'] == 'levelSensor':
-                GPIO.add_event_detect(pin, GPIO.RISING, callback=self.levelSensor, bouncetime=100) 
-                GPIO.add_event_detect(pin, GPIO.FALLING, callback=self.resetState, bouncetime=100) 
+                GPIO.add_event_detect(pin, GPIO.BOTH, callback=self.levelSensor, bouncetime=100) 
                 print(str(pin) + 'set as levelSensor callback')
             elif self.pinsIn[pin]['pinType'] == 'motor':
                 GPIO.add_event_detect(pin, GPIO.FALLING, callback=self.motorFault, bouncetime=100) 
@@ -98,18 +97,23 @@ class aquarium:
 
     def levelSensor(self, channel):
         #GPIO.add_event_detect(channel, GPIO.RISING, callback=my_callback, bouncetime=200)
-        self.pinsIn[channel]['state'] = 1 #set indicator to 1
-        print("pin state set to" + self.pinsIn[channel]['state']) # debug
-        if self.pinsIn[channel]['name'] == 'wastelvl':
-            print('wastelvl went high')
-        elif self.pinsIn[channel]['name'] == 'cleanlvl':
-            print('cleanlvl went high')
-        elif self.pinsIn[channel]['name'] == 'aqualvl':
-            print('aqualvl went high, turning off motors')
-            self.motorControl(name='drv0', speed=0, direction = 'brake')
-            self.display.drawStatus(text1='Aqua Hi', text2=('temp: ' + str(self.get_temp())))
-        elif self.pinsIn[channel]['name'] == 'sparelvl':
-            print('sparelvl went high')
+        self.pinsIn[channel]['state'] = GPIO.input(channel) #set indicator to 1
+        if self.pinsIn[channel]['state'] = 1:
+            print("pin state set to" + self.pinsIn[channel]['state']) # debug
+            if self.pinsIn[channel]['name'] == 'wastelvl':
+                print('wastelvl went high')
+            elif self.pinsIn[channel]['name'] == 'cleanlvl':
+                print('cleanlvl went high')
+            elif self.pinsIn[channel]['name'] == 'aqualvl':
+                print('aqualvl went high, turning off motors')
+                self.motorControl(name='drv0', speed=0, direction = 'brake')
+                self.display.drawStatus(text1='Aqua Hi', text2=('temp: ' + str(self.get_temp())))
+            elif self.pinsIn[channel]['name'] == 'sparelvl':
+                print('sparelvl went high')
+        else:
+            self.pinsIn[channel]['state'] = 0
+            print("pin state set to" + self.pinsIn[channel]['state']) # debug
+ 
 
     def resetState(self, channel):
         self.pinsIn[channel]['state'] = 0
