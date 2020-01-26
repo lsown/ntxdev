@@ -127,6 +127,9 @@ class aquarium:
             self.drv1.set_voltage(voltage)
             print("Setting direction " + direction + " " + str(voltage))
 
+        self.motors[name]['speed'] = speed
+        self.motors[name]['direction'] = direction
+
     def stateMonitor(self):
         #detects if level sensors have gone high
         return('hi')
