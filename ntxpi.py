@@ -113,6 +113,8 @@ class aquarium:
 
     def resetState(self, channel):
         self.pinsIn[channel]['state'] = 0
+        print("pin state set to" + self.pinsIn[channel]['state']) # debug
+
 
     def motorFault(self, channel):
         #GPIO.add_event_detect(channel, GPIO.RISING, callback=my_callback, bouncetime=200)
