@@ -99,7 +99,7 @@ class aquarium:
         #GPIO.add_event_detect(channel, GPIO.RISING, callback=my_callback, bouncetime=200)
         self.pinsIn[channel]['state'] = GPIO.input(channel) #set indicator to 1
         if self.pinsIn[channel]['state'] == 1:
-            print("pin state set to" + str(self.pinsIn[channel]['state']) # debug
+            print("pin state set to" + str(self.pinsIn[channel]['state'])) # debug
             if self.pinsIn[channel]['name'] == 'wastelvl':
                 print('wastelvl went high')
             elif self.pinsIn[channel]['name'] == 'cleanlvl':
