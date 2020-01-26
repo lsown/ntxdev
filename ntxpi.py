@@ -57,16 +57,19 @@ class aquarium:
         for pin in self.pinsOut:
             GPIO.setup(self.pinsOut[pin]['pin'], GPIO.OUT, initial = GPIO.LOW)
             print('0')
+
         for pin in self.pinsIn:
             GPIO.setup(pin, GPIO.IN)
             print(str(pin) + ' passed 1')
             self.pinsIn[pin]['state'] = GPIO.input(pin)
             print(str(pin) + 'passed 2')
+
             if self.pinsIn[pin]['pinType'] == 'levelSensor':
-                GPIO.add_event_detect(pin, GPIO.RISING, callback=self.levelSensor, bouncetime=10) 
+                GPIO.add_event_detect(pin, GPIO.RISING, callback=self.levelSensor, bouncetime=100) 
+                GPIO.add_event_detect(pin, GPIO.FALLING, callback=self.resetState, bouncetime=100) 
                 print(str(pin) + 'set as levelSensor callback')
             elif self.pinsIn[pin]['pinType'] == 'motor':
-                GPIO.add_event_detect(pin, GPIO.FALLING, callback=self.motorFault, bouncetime=10) 
+                GPIO.add_event_detect(pin, GPIO.FALLING, callback=self.motorFault, bouncetime=100) 
                 print(str(pin) + 'set as motor callback')
             elif self.pinsIn[pin]['pinType'] == 'interface':
                 GPIO.add_event_detect(pin, GPIO.RISING, callback=self.buttonPress, bouncetime=200) 
@@ -95,6 +98,8 @@ class aquarium:
 
     def levelSensor(self, channel):
         #GPIO.add_event_detect(channel, GPIO.RISING, callback=my_callback, bouncetime=200)
+        self.pinsIn[channel]['state'] = 1 #set indicator to 1
+        print("pin state set to" + self.pinsIn[channel]['state']) # debug
         if self.pinsIn[channel]['name'] == 'wastelvl':
             print('wastelvl went high')
         elif self.pinsIn[channel]['name'] == 'cleanlvl':
@@ -105,6 +110,9 @@ class aquarium:
             self.display.drawStatus(text1='Aqua Hi', text2=('temp: ' + str(self.get_temp())))
         elif self.pinsIn[channel]['name'] == 'sparelvl':
             print('sparelvl went high')
+
+    def resetState(self, channel):
+        self.pinsIn[channel]['state'] = 0
 
     def motorFault(self, channel):
         #GPIO.add_event_detect(channel, GPIO.RISING, callback=my_callback, bouncetime=200)
