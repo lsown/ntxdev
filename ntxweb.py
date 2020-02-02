@@ -5,14 +5,21 @@ from flask_moment import Moment
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
+
+from flask_socketio import SocketIO, emit, disconnect
 #from flask_sqlalchemy import SQLAlchemy
 #from flask_migrate import Migrate
 import ntxpi
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
+async_mode = None
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'hard to guess string'
+socketio = SocketIO(app, async_mode=async_mode)
+thread = None
+thread_lock = Lock()
+
 #app.config['SQLALCHEMY_DATABASE_URI'] =\
 #    'sqlite:///' + os.path.join(basedir, 'data.sqlite')
 #app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -24,6 +31,14 @@ moment = Moment(app)
 
 aquarium = ntxpi.aquarium()
 
+# runs every x seconds and updates values on WEBUI
+def aqState():
+	while True:
+		socketio.sleep(2)
+		aqdict = aquarium.get_status()
+		socketio.emit('aqStatemsg', 
+			{'data' : aqdict}, 
+			namespace='/aqState')
 
 @app.shell_context_processor
 def make_shell_context():
@@ -45,9 +60,21 @@ def index():
 	pinstatus = aquarium.pinsIn
 	return render_template('index.html', aqdict = aqdict, pinstatus = pinstatus)
 
+@socketio.on('connect', namespace='/aqState')
+def aqState_monitor():
+    global thread
+    with thread_lock:
+        if thread is None:
+            thread = socketio.start_background_task(aqState)
+
+@socketio.on('disconnect', namespace='/test')
+def test_disconnect():
+    print('Client disconnected')
+    #uncompleted
+
 @app.route('/onewire')
 def onewire():
     return render_template('index.html')
 
 if __name__ == '__main__': 
-  app.run(host='0.0.0.0',debug=True) 
+  socketio.run(app, host='0.0.0.0',debug=True) 
