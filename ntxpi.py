@@ -51,6 +51,9 @@ class aquarium:
         self.motorSetup()
 
         self.display = i2cdisplay.display() #creates a display object
+        self.display.drawStatus(text1='Welcome!', text2=('temp: ' + str(self.get_temp())))
+
+
 
     def piSetup(self): #Sets up GPIO pins, can also add to GPIO.in <pull_up_down=GPIO.PUD_UP>
 
@@ -86,8 +89,8 @@ class aquarium:
         if self.pinsIn[channel]['priorState'] == 0:
             GPIO.output(self.pinsOut['LEDPwr']['pin'], 1)
             self.pinsIn[channel]['priorState'] = 1
-            self.display.drawStatus(text1='pumping', text2=('temp: ' + str(self.get_temp())))
             self.motorControl(name='drv0', speed = 1, direction = 'forward')
+            self.display.drawStatus(text1='pumping', text2=('temp: ' + str(self.get_temp())))
         else:
             GPIO.output(self.pinsOut['LEDPwr']['pin'], 0)
             self.pinsIn[channel]['priorState'] = 0

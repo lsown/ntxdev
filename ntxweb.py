@@ -35,7 +35,7 @@ aquarium = ntxpi.aquarium()
 # runs every x seconds and updates values on WEBUI
 def aqState():
 	while True:
-		socketio.sleep(2)
+		socketio.sleep(1)
 		aqdict = aquarium.get_status()
 		pinstatus = aquarium.pinsIn
 		socketio.emit('aqStatemsg', 
