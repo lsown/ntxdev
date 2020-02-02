@@ -6,7 +6,7 @@
 {% block page_content %}
 <div class="page-header">
 <h1>Aquarium Status</h1>
-	</div>
+</div>
 <!--
 	<ul>    	
     	{% for key, value in aqdict.items() %}
@@ -18,8 +18,10 @@
     	<li>Realtime : {{moment().format('MMMM Do YYYY, h:mm:ss a')}}</li>
     </ul>
 -->
-    <h2>Aquarium State<h2>
+<body>
+    <h2>Aquarium State</h2>
     <ul id='aqStatelist'>Loading Aquarium State...</ul>
     <h2>Pin State</h2>
     <ul id='pinStatelist'>Loading Pin State...</ul>
+<body>
 {% endblock %}
