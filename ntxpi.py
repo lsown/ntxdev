@@ -19,6 +19,7 @@ class aquarium:
     def __init__(self):
         
         self.aquariumID = 100
+        self.buttonTime = 0
         import onewiretemp as onewiretemp
         self.aqtemp = onewiretemp.onewiretemp() #creates an temp object
         '''
@@ -85,18 +86,20 @@ class aquarium:
 
     def buttonPress(self, channel):
         print('button press detected: ' + 'prior state was ' + str(self.pinsIn[channel]['priorState']))
-        self.pinsIn[channel]['state'] = GPIO.input(channel) #set state to 1
-        if self.pinsIn[channel]['priorState'] == 0:
-            GPIO.output(self.pinsOut['LEDPwr']['pin'], 1)
-            self.pinsIn[channel]['priorState'] = 1
-            self.motorControl(name='drv0', speed = 1, direction = 'forward')
-            #self.display.drawStatus(text1='pumping', text2=('temp: ' + str(self.get_temp())))
-        else:
-            GPIO.output(self.pinsOut['LEDPwr']['pin'], 0)
-            self.pinsIn[channel]['priorState'] = 0
-            self.motorControl(name='drv0', speed = 0, direction = 'brake')
-            #self.display.drawStatus(text1='idle', text2=('temp: ' + str(self.get_temp())))
-        print('LED state changed to ' + str(self.pinsIn[channel]['priorState']))
+        if ((time.time() - self.buttonTime) > 1:    
+            self.pinsIn[channel]['state'] = GPIO.input(channel) #set state to 1
+            if self.pinsIn[channel]['priorState'] == 0:
+                GPIO.output(self.pinsOut['LEDPwr']['pin'], 1)
+                self.pinsIn[channel]['priorState'] = 1
+                self.motorControl(name='drv0', speed = 1, direction = 'forward')
+                self.display.drawStatus(text1='pumping', text2=('temp: ' + str(self.get_temp())))
+            else:
+                GPIO.output(self.pinsOut['LEDPwr']['pin'], 0)
+                self.pinsIn[channel]['priorState'] = 0
+                self.motorControl(name='drv0', speed = 0, direction = 'brake')
+                self.display.drawStatus(text1='idle', text2=('temp: ' + str(self.get_temp())))
+            print('LED state changed to ' + str(self.pinsIn[channel]['priorState']))
+            self.buttonTime = time.time() #sets a time for last button press
 
     def levelSensor(self, channel):
         self.pinsIn[channel]['state'] = GPIO.input(channel) #set state to 1
