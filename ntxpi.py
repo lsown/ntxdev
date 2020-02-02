@@ -86,7 +86,7 @@ class aquarium:
 
     def buttonPress(self, channel):
         print('button press detected: ' + 'prior state was ' + str(self.pinsIn[channel]['priorState']))
-        if ((time.time() - self.buttonTime) > 1:    
+        if ((time.time() - self.buttonTime) > 1):    
             self.pinsIn[channel]['state'] = GPIO.input(channel) #set state to 1
             if self.pinsIn[channel]['priorState'] == 0:
                 GPIO.output(self.pinsOut['LEDPwr']['pin'], 1)
