@@ -64,7 +64,7 @@ def index():
 
 @socketio.on('connect', namespace='/aqState')
 def aqState_monitor():
-    global thread
+    global thread1
     with thread_lock:
         if thread is None:
             thread = socketio.start_background_task(aqState)

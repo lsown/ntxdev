@@ -152,9 +152,11 @@ class aquarium:
         return {
             'temp': self.get_temp(),
             'motor1' : self.motors['drv0']['state'],
-            'motor2' : 'OFF',
-            'AqFlag' : 'LOW',
-            'ExFlag' : 'LOW',
+            'motor2' : self.motors['drv0']['state'],
+            'AqFlag' : self.pinsIn[13]['state'],
+            'CleanFlag' : self.pinsIn[19]['state'],
+            'WasteFlag' : self.pinsIn[6]['state'],
+            'SpareFlag' : self.pinsIn[26]['state'],
             'time' : datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
         } #0 is celcius, 1 is farenheit
 
