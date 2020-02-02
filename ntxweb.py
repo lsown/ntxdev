@@ -7,6 +7,7 @@ from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
 
 from flask_socketio import SocketIO, emit, disconnect
+from threading import Lock
 #from flask_sqlalchemy import SQLAlchemy
 #from flask_migrate import Migrate
 import ntxpi
