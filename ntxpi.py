@@ -96,7 +96,6 @@ class aquarium:
         print('LED state changed to ' + str(self.pinsIn[channel]['priorState']))
 
     def levelSensor(self, channel):
-        #GPIO.add_event_detect(channel, GPIO.RISING, callback=my_callback, bouncetime=200)
         self.pinsIn[channel]['state'] = GPIO.input(channel) #set state to 1
         if self.pinsIn[channel]['state'] == 1:
             print("pin state set to" + str(self.pinsIn[channel]['state'])) # debug
@@ -151,7 +150,7 @@ class aquarium:
     def get_status(self):
         return {
             'temp': self.get_temp(),
-            'motor1' : 'ON',
+            'motor1' : str(self.motors['drv0']['direction']) + ': ' str(self.motors['drv0']['speed']),
             'motor2' : 'OFF',
             'AqFlag' : 'LOW',
             'ExFlag' : 'LOW',
