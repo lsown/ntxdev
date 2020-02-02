@@ -43,8 +43,8 @@ class aquarium:
             'LEDPwr' : {'name' : 'LEDPwr', 'state' : 0, 'pin' : 18} 
         }
         self.motors = {
-            'drv0' : {'name' : 'wastePump', 'i2cAddress' : 0x60, 'speed' : 0, 'direction' : 'cw', 'faultpin' : 17},
-            'drv1' : {'name' : 'containerPump', 'i2cAddress' : 0x61, 'speed' : 0, 'direction' : 'cw', 'faultpin' : 27},
+            'drv0' : {'name' : 'wastePump', 'i2cAddress' : 0x60, 'speed' : 0, 'direction' : 'cw', 'faultpin' : 17, 'state' : 'cw: 0'},
+            'drv1' : {'name' : 'containerPump', 'i2cAddress' : 0x61, 'speed' : 0, 'direction' : 'cw', 'faultpin' : 27, 'state' : 'cw: 0'},
             #'drv2' : {'name' : 'sparePump', 'i2cAddress' : 0x62, 'speed' : 0, 'direction' : 'cw', 'faultpin': 22}
         }
         self.piSetup()
@@ -142,6 +142,7 @@ class aquarium:
 
         self.motors[name]['speed'] = speed
         self.motors[name]['direction'] = direction
+        self.motors[name]['state'] = (direction + ": " + str(speed))
 
     def stateMonitor(self):
         #detects if level sensors have gone high
@@ -150,7 +151,7 @@ class aquarium:
     def get_status(self):
         return {
             'temp': self.get_temp(),
-            'motor1' : str(self.motors['drv0']['direction']) + ': ' str(self.motors['drv0']['speed']),
+            'motor1' : self.motors['drv0']['state'],
             'motor2' : 'OFF',
             'AqFlag' : 'LOW',
             'ExFlag' : 'LOW',
