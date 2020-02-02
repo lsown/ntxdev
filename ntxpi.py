@@ -74,7 +74,7 @@ class aquarium:
                 GPIO.add_event_detect(pin, GPIO.FALLING, callback=self.motorFault, bouncetime=100) 
                 print(str(pin) + ' set as motor callback')
             elif self.pinsIn[pin]['pinType'] == 'interface':
-                GPIO.add_event_detect(pin, GPIO.RISING, callback=self.buttonPress, bouncetime=500) 
+                GPIO.add_event_detect(pin, GPIO.RISING, callback=self.buttonPress, bouncetime=100) 
                 print(str(pin) + ' set as button callback')
             print(str(pin) + ' passed 3')
 
@@ -90,12 +90,12 @@ class aquarium:
             GPIO.output(self.pinsOut['LEDPwr']['pin'], 1)
             self.pinsIn[channel]['priorState'] = 1
             self.motorControl(name='drv0', speed = 1, direction = 'forward')
-            self.display.drawStatus(text1='pumping', text2=('temp: ' + str(self.get_temp())))
+            #self.display.drawStatus(text1='pumping', text2=('temp: ' + str(self.get_temp())))
         else:
             GPIO.output(self.pinsOut['LEDPwr']['pin'], 0)
             self.pinsIn[channel]['priorState'] = 0
-            self.motorControl(name='drv0', speed = 1, direction = 'brake')
-            self.display.drawStatus(text1='idle', text2=('temp: ' + str(self.get_temp())))
+            self.motorControl(name='drv0', speed = 0, direction = 'brake')
+            #self.display.drawStatus(text1='idle', text2=('temp: ' + str(self.get_temp())))
         print('LED state changed to ' + str(self.pinsIn[channel]['priorState']))
 
     def levelSensor(self, channel):
