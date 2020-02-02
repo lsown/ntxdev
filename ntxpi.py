@@ -65,18 +65,18 @@ class aquarium:
             GPIO.setup(pin, GPIO.IN)
             print(str(pin) + ' passed 1')
             self.pinsIn[pin]['state'] = GPIO.input(pin)
-            print(str(pin) + 'passed 2')
+            print(str(pin) + ' passed 2')
 
             if self.pinsIn[pin]['pinType'] == 'levelSensor':
                 GPIO.add_event_detect(pin, GPIO.BOTH, callback=self.levelSensor, bouncetime=100) 
-                print(str(pin) + 'set as levelSensor callback')
+                print(str(pin) + ' set as levelSensor callback')
             elif self.pinsIn[pin]['pinType'] == 'motor':
                 GPIO.add_event_detect(pin, GPIO.FALLING, callback=self.motorFault, bouncetime=100) 
-                print(str(pin) + 'set as motor callback')
+                print(str(pin) + ' set as motor callback')
             elif self.pinsIn[pin]['pinType'] == 'interface':
-                GPIO.add_event_detect(pin, GPIO.RISING, callback=self.buttonPress, bouncetime=100) 
-                print(str(pin) + 'set as button callback')
-            print(str(pin) + 'passed 3')
+                GPIO.add_event_detect(pin, GPIO.RISING, callback=self.buttonPress, bouncetime=500) 
+                print(str(pin) + ' set as button callback')
+            print(str(pin) + ' passed 3')
 
     def motorSetup(self):
         self.drv0 = drv8830.DRV8830(i2c_addr=0x60)
