@@ -7,17 +7,16 @@
 <div class="page-header">
 <h1>Aquarium Status</h1>
 	</div>
-	<ul>
+<!--
+	<ul>    	
     	{% for key, value in aqdict.items() %}
     	<li>{{key}} : {{value}}</li>
     	{% endfor %}
-    	<li>Realtime : {{moment().format('MMMM Do YYYY, h:mm:ss a')}}</li>
-    	{% for key, value in pinstatus.items() %}
-    	<!-- <li>{{key}} : {{value}}</li>
-    	{% endfor %} -->
     	{% for key, value in pinstatus.items() %}
     	<li>{{value['name']}} state is {{value['state']}}</li>
     	{% endfor %}
+    	<li>Realtime : {{moment().format('MMMM Do YYYY, h:mm:ss a')}}</li>
     </ul>
+-->
     <ul id='aqStatelist'>" "</ul>
 {% endblock %}

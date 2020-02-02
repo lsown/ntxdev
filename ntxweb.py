@@ -37,13 +37,14 @@ def aqState():
 	while True:
 		socketio.sleep(2)
 		aqdict = aquarium.get_status()
+		pinstatus = aquarium.pinsIn
 		socketio.emit('aqStatemsg', 
 			{'data' : aqdict}, 
 			namespace='/aqState')
 
-@app.shell_context_processor
-def make_shell_context():
-    return dict(db=db, User=User, Role=Role)
+#@app.shell_context_processor
+#def make_shell_context():
+#    return dict(db=db, User=User, Role=Role)
 
 @app.errorhandler(404)
 def page_not_found(e):
