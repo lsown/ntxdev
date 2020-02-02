@@ -71,7 +71,7 @@ class aquarium:
                 GPIO.add_event_detect(pin, GPIO.FALLING, callback=self.motorFault, bouncetime=100) 
                 print(str(pin) + 'set as motor callback')
             elif self.pinsIn[pin]['pinType'] == 'interface':
-                GPIO.add_event_detect(pin, GPIO.RISING, callback=self.buttonPress, bouncetime=200) 
+                GPIO.add_event_detect(pin, GPIO.RISING, callback=self.buttonPress, bouncetime=100) 
                 print(str(pin) + 'set as button callback')
             print(str(pin) + 'passed 3')
 
@@ -142,7 +142,7 @@ class aquarium:
 
         self.motors[name]['speed'] = speed
         self.motors[name]['direction'] = direction
-        self.motors[name]['state'] = (direction + ": " + str(speed))
+        self.motors[name]['state'] = (direction + " direction @ speed " + str(speed))
 
     def stateMonitor(self):
         #detects if level sensors have gone high
