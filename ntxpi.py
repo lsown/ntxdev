@@ -144,7 +144,7 @@ class aquarium:
         if name == 'drv1':
             self.drv1.set_direction(direction)
             self.drv1.set_voltage(voltage)
-            print("Setting direction " + direction + " " + str(voltage))
+            print("Setting direction " + name + direction + " " + str(voltage))
 
         self.motors[name]['speed'] = speed
         self.motors[name]['direction'] = direction
