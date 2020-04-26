@@ -10,7 +10,7 @@ from flask_socketio import SocketIO, emit, disconnect
 from threading import Lock
 #from flask_sqlalchemy import SQLAlchemy
 #from flask_migrate import Migrate
-#import ntxpi
+import ntxpi
 import random
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -25,7 +25,7 @@ thread_lock = Lock()
 bootstrap = Bootstrap(app)
 moment = Moment(app)
 
-#aquarium = ntxpi.aquarium()
+aquarium = ntxpi.aquarium()
 
 # runs every x seconds and updates values on WEBUI
 aqdict = {
@@ -49,7 +49,7 @@ aqConfig = {
 def aqState():
 	while True:
 		socketio.sleep(1)
-		aqdict['temp'] = random.randrange(0,30)
+		aqdict['temp'] = aquarium.get_temp()
 		aqdict['CleanFlag'] = random.randrange(0,2)
 		aqdict['AqFlag'] = random.randrange(0,2)
 		aqdict['drv0'] = True if random.randrange(0,2) == 0 else False
@@ -74,15 +74,11 @@ def internal_server_error(e):
 @app.route('/')
 def index():
 	return render_template('index.html')
-
-@app.route('/settings')
-def settings():
-	return render_template('settings.html')
-
+'''
 @app.route('/analytics')
 def analytics():
 	return render_template('analytics.html')
-
+'''
 @socketio.on('connect', namespace='/aqState')
 def aqState_monitor():
 	global thread

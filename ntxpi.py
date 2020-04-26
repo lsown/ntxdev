@@ -3,6 +3,8 @@ import os
 import glob
 import time
 from datetime import datetime
+import threading
+
 
 #Rpi related objects
 from RPi import GPIO as GPIO
@@ -203,3 +205,15 @@ class aquarium:
         print("Steppers finished %s steps at frequency %s" % (steps, frequency))
         GPIO.output(stepEnPin,1) #disable stepper power
         print("Stepper disabled")
+'''
+class myThread (threading.Thread):
+   def __init__(self, threadID, name, counter, functionPass):
+      threading.Thread.__init__(self)
+      self.threadID = threadID
+      self.name = name
+      self.counter = counter
+   def run(self):
+      print("Starting thread: " + self.name)
+      self.functionPass
+      print("Exiting thread: " + self.name)
+'''
