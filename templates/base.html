@@ -1,48 +1,79 @@
-{% extends "bootstrap/base.html" %}
+<!doctype html>
+<html lang="en">
+  <head>
+    {% block head %}
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-{% block title %}Flasky{% endblock %}
+    {% block styles %}
+    <!-- Bootstrap CSS -->
+    {{ bootstrap.load_css() }}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- Bootstrap toggle CSS-->
+    <link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css" rel="stylesheet">
+    <!-- NoUI Slider CSS-->
+    <link rel="stylesheet" href="./static/css/nouislider.css"/>
+    <link rel="stylesheet" href="./static/css/ntxcustom.css"/>
+    {% endblock %}
 
-{% block head %}
-{{ super() }}
-<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
-<link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <title>NTX</title>
+    <h1>Nanotank Water Exchanger</h1>
+    
+  </head>
+    {% endblock %}
+  <body>
 
-{% endblock %}
+    {% block navbar %}
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-3">
+      <div class="container-fluid">
+          <a href="#" class="navbar-brand mr-1">Nanotank</a>
+          <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
+              <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+              <div class="navbar-nav">
+                  <a href="/" class="nav-item nav-link active">Home</a>
+                  <a href="/settings" class="nav-item nav-link">Settings</a>
+                  <a href="/analytics" class="nav-item nav-link">Analytics</a>
+                  <a href="#" class="nav-item nav-link">Contact</a>
+              </div>
+              <div class="navbar-nav ml-auto">
+                  <a href="#" class="nav-item nav-link">Register</a>
+                  <a href="#" class="nav-item nav-link">Login</a>
+              </div>
+          </div>
+      </div>    
+    </nav>
 
-{% block navbar %}
-<div class="navbar navbar-inverse" role="navigation">
+    {% endblock %}
+
+    <!-- Your page content -->
+    {% block content %}
     <div class="container">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="/">NTX</a>
-        </div>
-        <div class="navbar-collapse collapse">
-            <ul class="nav navbar-nav">
-                <li><a href="/">Home</a></li>
-                <li><a href="/">Motor</a></li>
-                <li><a href="/">Analytics</a></li>
-            </ul>
-        </div>
-    </div>
-</div>
-{% endblock %}
-
-{% block content %}
-<div class="container">
     {% block page_content %}{% endblock %}
-</div>
-{% endblock %}
+    </div>
+    {% endblock %}
 
-{% block scripts %}
-{{ super() }}
-{{ moment.include_moment() }}
-    <script src="//code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+    {% block scripts %}
+    <!-- Optional JavaScript -->
+    
+    {{ moment.include_moment() }}
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    
     <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+    
+    <!-- Bootstrap toggle JS-->
+    <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
+
+    <!-- NoUISlider JS note that it references relative position, note /static directory structure for FLASK-->
+    <script type="text/javascript" src="./static/js/nouislider.js"></script>
+    <script type="text/javascript" src="./static/js/wNumb.js"></script>
+
     <script type="text/javascript" charset="utf-8">
     $(document).ready(function() {
     // An application can open a connection on multiple namespaces, and
@@ -64,16 +95,22 @@
     });
 
     socket.on('aqStatemsg', function(msg) {
-        console.log("Received number" + msg.data)
+        //console.log("Received number" + msg.data)
         let x = []                
         for (let key in msg.data) {
           //console.log("number is " + msg.data[key])
-          x.push('<li>' + key + ": " + msg.data[key] + '</li>')
+          //x.push('<li>' + key + ": " + msg.data[key] + '</li>')
         };
-        console.log(x)
+        //console.log(x)
         $('#aqStatelist').html(x)
+        
     });
 
 });
     </script>
-{% endblock %}
+    {% endblock %}
+
+  </body>
+
+</html>
+
