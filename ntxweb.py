@@ -17,7 +17,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 async_mode = None
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'hard to guess string'
-socketio = SocketIO(app, async_mode=async_mode)
+socketio = SocketIO(app, async_mode=async_mode, cors_allowed_origins="*")
 thread = None
 thread_lock = Lock()
 
