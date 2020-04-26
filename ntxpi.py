@@ -74,7 +74,7 @@ class aquarium:
     def piSetup(self): #Sets up GPIO pins, can also add to GPIO.in <pull_up_down=GPIO.PUD_UP>
 
         for pin in self.pinsOut:
-            GPIO.setup(self.pinsOut[pin]['pin'], GPIO.OUT, initial = GPIO.LOW)
+            GPIO.setup(self.pinsOut[pin]['pin'], GPIO.OUT, initial = self.pinsOut[pin]['state'])
             print('0')
 
         for pin in self.pinsIn:
@@ -183,3 +183,23 @@ class aquarium:
 
     def get_temp(self):
         return self.aqtemp.read_temp()[0] #0 is celcius, 1 is farenheit
+
+    def drv8825(self, frequency, direction, steps, stepEnPin = 20, stepDirPin = 21, stepStepPin = 18):
+        stepTime = 1/frequency/2 #duration for high, duration for low
+        totalTime = 1/frequency * steps #calculates total estimated time for routine to finish
+        if direction == 1:
+            GPIO.output(stepDirPin, 1)
+        else:
+            GPIO.output(stepDirPin, 0)
+        GPIO.output(stepEnPin, 0) #enable drv8825 chip
+        print("Stepper enabled, estimated time %s" %(str(totalTime)))
+        count = 0
+        while count <= steps:
+            GPIO.output(stepStepPin, 1)
+            time.sleep(stepTime)
+            GPIO.output(stepStepPin,0)
+            time.sleep(stepTime)
+            count += 1
+        print("Steppers finished %s steps at frequency %s" % (steps, frequency))
+        GPIO.output(stepEnPin,1) #disable stepper power
+        print("Stepper disabled")
