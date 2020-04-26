@@ -55,8 +55,7 @@ def aqState():
 		aqdict['drv0'] = True if random.randrange(0,2) == 0 else False
 		if aqdict['exchangeState'] == True:
 			aquarium.drv8825(500, 0, 5000)
-		else:
-			aquarium.drv8825(500, 0, 0)
+			aqdict['exchangeState'] = False
 		#pinstatus = aquarium.pinsIn
 		socketio.emit('aqStatemsg', 
 			{'data' : aqdict}, 
