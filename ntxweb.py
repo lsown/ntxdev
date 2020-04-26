@@ -29,7 +29,7 @@ aquarium = ntxpi.aquarium()
 
 # runs every x seconds and updates values on WEBUI
 aqdict = {
-	'temp': random.randrange(0,60),
+	'temp': aquarium.get_temp(),
 	'drv0' : True if random.randrange(0,2) == 0 else False,
 	'drv1' : True if random.randrange(0,2) == 0 else False,
 	'drv0Spd' : 0,
@@ -53,6 +53,8 @@ def aqState():
 		aqdict['CleanFlag'] = random.randrange(0,2)
 		aqdict['AqFlag'] = random.randrange(0,2)
 		aqdict['drv0'] = True if random.randrange(0,2) == 0 else False
+        if aqdict['exchangeState'] = True:
+            aquarium.drv8825(500, 0, 5000)
 		#pinstatus = aquarium.pinsIn
 		socketio.emit('aqStatemsg', 
 			{'data' : aqdict}, 
