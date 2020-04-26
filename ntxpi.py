@@ -100,26 +100,26 @@ class aquarium:
         #self.drv2 = drv8830.DRV8830(i2c_addr=0x62) #note, change HW to 0x63 to work with library
 
     def buttonPress(self, channel):
-        print('button press detected: ' + 'prior state was ' + str(self.pinsIn[channel]['priorState']))
+        print('button press detected: prior state was %s' + %(str(self.pinsIn[channel]['priorState'])))
         if ((time.time() - self.buttonTime) > 1):    
             self.pinsIn[channel]['state'] = GPIO.input(channel) #set state to 1
             if self.pinsIn[channel]['priorState'] == 0:
                 GPIO.output(self.pinsOut['LEDPwr']['pin'], 1)
                 self.pinsIn[channel]['priorState'] = 1
                 self.motorControl(name='drv0', speed = 1, direction = 'forward')
-                self.display.drawStatus(text1='pumping', text2=('temp: ' + str(self.get_temp())))
+                self.display.drawStatus(text1='pumping', text2=('temp: %s' %(str(self.get_temp()))))
             else:
                 GPIO.output(self.pinsOut['LEDPwr']['pin'], 0)
                 self.pinsIn[channel]['priorState'] = 0
                 self.motorControl(name='drv0', speed = 0, direction = 'brake')
-                self.display.drawStatus(text1='idle', text2=('temp: ' + str(self.get_temp())))
+                self.display.drawStatus(text1='idle', text2=('temp: %s' + %(str(self.get_temp()))))
             print('LED state changed to ' + str(self.pinsIn[channel]['priorState']))
             self.buttonTime = time.time() #sets a time for last button press
 
     def levelSensor(self, channel):
         self.pinsIn[channel]['state'] = GPIO.input(channel) #set state to 1
         if self.pinsIn[channel]['state'] == 1:
-            print("pin state set to" + str(self.pinsIn[channel]['state'])) # debug
+            print("pin state set to %s" %(str(self.pinsIn[channel]['state']))) # debug
             if self.pinsIn[channel]['name'] == 'wastelvl':
                 print('wastelvl went high')
             elif self.pinsIn[channel]['name'] == 'cleanlvl':
@@ -132,19 +132,19 @@ class aquarium:
                 print('sparelvl went high')
         else:
             self.pinsIn[channel]['state'] = 0
-            print("pin state set to" + str(self.pinsIn[channel]['state'])) # debug
+            print("pin state set to %s" %(str(self.pinsIn[channel]['state']))) # debug
  
 
     def resetState(self, channel):
         self.pinsIn[channel]['state'] = 0
-        print("pin state set to" + self.pinsIn[channel]['state']) # debug
+        print("pin state set to %s" %(self.pinsIn[channel]['state'])) # debug
 
 
     def motorFault(self, channel):
         #GPIO.add_event_detect(channel, GPIO.RISING, callback=my_callback, bouncetime=200)
         for i in self.motors:
             if self.motors[i]['faultpin'] == channel:
-                print(i + "has tripped a fault")
+                print("%s has tripped a fault" %(str(i)))
 
     def motorControl(self, name='drv0', i2cAddress=0x60, speed=1, direction='forward'):
         if speed > 1:
