@@ -7,13 +7,28 @@ from datetime import datetime
 #Rpi related objects
 from RPi import GPIO as GPIO
 GPIO.setmode(GPIO.BCM)
-
 import drv8830 #motor drive library
 import i2cdisplay
 
-#level sensors - signal goes HIGH when water detected
-#motor fault pins - need to configure for pullup, these go low when fault detected
-#button - we may want to add 0.1 uF to c7. Hi when button depressed.
+#fake rpi objects - use these when rpi not available
+"""
+#note this is a local pointer, adjust reference locale as needed.
+import sys
+sys.path.insert(1, '/Users/lsown/Desktop/ntxdev/simPi') 
+
+import sim_RPi
+import sim_drv8830
+import sim_i2cdisplay
+
+"""
+
+
+"""
+Notes to remember:
+level sensors - signal goes HIGH when water detected
+motor fault pins - need to configure for pullup, these go low when fault detected
+button - we may want to add 0.1 uF to c7. Hi when button depressed.
+"""
 
 class aquarium:
     def __init__(self):
@@ -22,12 +37,7 @@ class aquarium:
         self.buttonTime = 0
         import onewiretemp as onewiretemp
         self.aqtemp = onewiretemp.onewiretemp() #creates an temp object
-        '''
-        self.pinsIn = {
-            5 : {'name' : 'lvlEN', 'pinType': 'levelSensor', 'state' : 1},
-            6 : {'name' : 'wastelvl', 'pinType': 'levelSensor', 'state' : 0}
-            }
-        '''
+
         self.pinsIn = {
             #5 : {'name' : 'lvlEN', 'pinType': 'levelSensor', 'state' : 0},
             6 : {'name' : 'wastelvl', 'pinType': 'levelSensor', 'state' : 0},
@@ -41,7 +51,10 @@ class aquarium:
         }
         self.pinsOut = {
             #24 : {'name' : 'I2C RST', 'state' : 0},
-            'LEDPwr' : {'name' : 'LEDPwr', 'state' : 0, 'pin' : 18} 
+            'LEDPwr' : {'name' : 'LEDPwr', 'state' : 0, 'pin' : 25},
+            'stepDir' : {'name' : 'stepDir', 'state' : 0, 'pin' : 21},
+            'stepEn' : {'name' : 'stepEn', 'state' : 1, 'pin' : 20}, 
+            'stepStep' : {'name' : 'stepStep', 'state' : 0, 'pin' : 18}
         }
         self.motors = {
             'drv0' : {'name' : 'wastePump', 'i2cAddress' : 0x60, 'speed' : 0, 'direction' : 'cw', 'faultpin' : 17, 'state' : 'cw: 0'},
@@ -53,8 +66,6 @@ class aquarium:
 
         self.display = i2cdisplay.display() #creates a display object
         self.display.drawStatus(text1='Welcome!', text2=('temp: ' + str(self.get_temp())))
-
-
 
     def piSetup(self): #Sets up GPIO pins, can also add to GPIO.in <pull_up_down=GPIO.PUD_UP>
 
