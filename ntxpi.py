@@ -100,7 +100,7 @@ class aquarium:
         #self.drv2 = drv8830.DRV8830(i2c_addr=0x62) #note, change HW to 0x63 to work with library
 
     def buttonPress(self, channel):
-        print('button press detected: prior state was %s' + %(str(self.pinsIn[channel]['priorState'])))
+        print('button press detected: prior state was %s' %(str(self.pinsIn[channel]['priorState'])))
         if ((time.time() - self.buttonTime) > 1):    
             self.pinsIn[channel]['state'] = GPIO.input(channel) #set state to 1
             if self.pinsIn[channel]['priorState'] == 0:
@@ -112,7 +112,7 @@ class aquarium:
                 GPIO.output(self.pinsOut['LEDPwr']['pin'], 0)
                 self.pinsIn[channel]['priorState'] = 0
                 self.motorControl(name='drv0', speed = 0, direction = 'brake')
-                self.display.drawStatus(text1='idle', text2=('temp: %s' + %(str(self.get_temp()))))
+                self.display.drawStatus(text1='idle', text2=('temp: %s' %(str(self.get_temp()))))
             print('LED state changed to ' + str(self.pinsIn[channel]['priorState']))
             self.buttonTime = time.time() #sets a time for last button press
 
