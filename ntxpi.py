@@ -22,7 +22,6 @@ import sim_i2cdisplay
 
 """
 
-
 """
 Notes to remember:
 level sensors - signal goes HIGH when water detected
@@ -61,11 +60,16 @@ class aquarium:
             'drv1' : {'name' : 'containerPump', 'i2cAddress' : 0x61, 'speed' : 0, 'direction' : 'cw', 'faultpin' : 27, 'state' : 'cw: 0'},
             #'drv2' : {'name' : 'sparePump', 'i2cAddress' : 0x62, 'speed' : 0, 'direction' : 'cw', 'faultpin': 22}
         }
-        self.piSetup()
-        self.motorSetup()
+
+        self.piSetup() #sets up the pi pin configurations
+        self.drv8830Setup() #sets up the channels for i2c motor drivers
 
         self.display = i2cdisplay.display() #creates a display object
-        self.display.drawStatus(text1='Welcome!', text2=('temp: ' + str(self.get_temp())))
+        self.display.drawStatus(
+            text1='Welcome!', 
+            text2=('temp: %s' %(str(self.get_temp())) 
+                )
+            )
 
     def piSetup(self): #Sets up GPIO pins, can also add to GPIO.in <pull_up_down=GPIO.PUD_UP>
 
@@ -90,7 +94,7 @@ class aquarium:
                 print(str(pin) + ' set as button callback')
             print(str(pin) + ' passed 3')
 
-    def motorSetup(self):
+    def drv8830Setup(self):
         self.drv0 = drv8830.DRV8830(i2c_addr=0x60)
         self.drv1 = drv8830.DRV8830(i2c_addr=0x61)
         #self.drv2 = drv8830.DRV8830(i2c_addr=0x62) #note, change HW to 0x63 to work with library
@@ -179,13 +183,3 @@ class aquarium:
 
     def get_temp(self):
         return self.aqtemp.read_temp()[0] #0 is celcius, 1 is farenheit
-
-    def readPin(self):
-        try:
-            GPIO.setup(int(pin), GPIO.IN)
-            if GPIO.input(int(pin)) == True:
-                response = "Pin number " + pin + " is high!"
-            else:
-                response = "Pin number " + pin + " is low!"
-        except:
-          response = "There was an error reading pin " + pin + "."
