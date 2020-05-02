@@ -62,7 +62,7 @@ class aquarium:
             'wasteFlag' : {'name' : 'wasteFlag', 'pinType': 'levelSensor', 'state' : 0, 'pin' : 6},
             'cleanFlag' : {'name' : 'cleanFlag', 'pinType': 'levelSensor', 'state' : 0, 'pin' : 19},
             'aquaFlag' : {'name' : 'aquaFlag', 'pinType': 'levelSensor', 'state' : 0, 'pin' : 13},
-            'spareflag' : {'name' : 'SpareFlag', 'pinType': 'levelSensor', 'state' : 0, 'pin' : 26},
+            'spareflag' : {'name' : 'spareFlag', 'pinType': 'levelSensor', 'state' : 0, 'pin' : 26},
             'FAULTn1' : {'name' : 'FAULTn1', 'pinType': 'motor', 'state' : 0, 'pin' : 17},
             'FAULTn2' : {'name' : 'FAULTn2', 'pinType': 'motor', 'state' : 0, 'pin' : 27},
             'FAULTn3' : {'name' : 'FAULTn3', 'pinType': 'motor', 'state' : 0, 'pin' : 22},
