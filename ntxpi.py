@@ -105,7 +105,7 @@ class aquarium:
 
             #configure event detections for pinType levelSensor & interface
             if self.pinsIn[i]['pinType'] == 'levelSensor':
-                GPIO.add_event_detect(self.pinsIn[i]['pin'], GPIO.BOTH, callback=self.levelSensor, bouncetime=100) 
+                GPIO.add_event_detect(self.pinsIn[i]['pin'], GPIO.BOTH, callback=self.levelSensor, bouncetime=200) 
                 print('%s set as levelSensor callback' %(str(self.pinsIn[i]['name'])))
             elif self.pinsIn[i]['pinType'] == 'interface':
                 GPIO.add_event_detect(self.pinsIn[i]['pin'], GPIO.RISING, callback=self.buttonPress, bouncetime=100) 
@@ -135,6 +135,12 @@ class aquarium:
     def get_temp(self):
         return self.aqtemp.read_temp()[0]
 
+    def setState(self, channel, value):
+        for i in self.pinsIn:
+            if channel == self.pinsIn[i]['pin']:
+                self.pinsIn[i]['state'] = value
+                print('%s triggered HI, %s configured state to %s' %(str(channel), self.pinsIn[i]['name'], self.pinsIn[i]['state'])) # debug
+
     def buttonPress(self, channel):
         print('button press detected: prior state was %s' %(str(self.pinsIn[channel]['priorState'])))
         if ((time.time() - self.buttonTime) > 1):    
@@ -155,19 +161,20 @@ class aquarium:
 
     def levelSensor(self, channel):
         if GPIO.input(channel) == 1:
-            print(time.time())
+            self.setState(channel, 1)
+            """
             for i in self.pinsIn:
                 if channel == self.pinsIn[i]['pin']:
                     self.pinsIn[i]['state'] = 1
-                    print('%s triggered HI, %s configured state to %s' %(str(channel), self.pinsIn[i]['name'], str(channel))) # debug
-            print(time.time())
+                    print('%s triggered HI, %s configured state to %s' %(str(channel), self.pinsIn[i]['name'], self.pinsIn[i]['state'])) # debug
+            """
             self.motorControl(name='drv0', speed=0, direction = 'brake')
             self.display.drawStatus(text1='Aqualevel Hi', text2=('temp: ' + str(self.get_temp())))
         if GPIO.input(channel) == 0:
             for i in self.pinsIn:
                 if channel == self.pinsIn[i]['pin']:
                     self.pinsIn[i]['state'] = 0
-                    print('%s triggered LOW, %s configured state to %s' %(str(channel), self.pinsIn[i]['name'], str(channel)))
+                    print('%s triggered LOW, %s configured state to %s' %(str(channel), self.pinsIn[i]['name'], self.pinsIn[i]['state']))
 
     def resetState(self, channel):
         self.pinsIn[channel]['state'] = 0
