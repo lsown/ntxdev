@@ -156,6 +156,10 @@ class aquarium:
     def levelSensor(self, channel):
         if GPIO.input(channel) == 1:
             print("%s triggered HI" %(str(channel))) # debug
+            for i in self.pinsIn:
+                if channel == self.pinsIn[i]['pin']:
+                    self.pinsIn[i]['state'] = 1
+                    print('%s configured state to 1' %(self.pinsIn[i]['name']))
             print('aqualvl went high, turning off motors')
             self.motorControl(name='drv0', speed=0, direction = 'brake')
             self.display.drawStatus(text1='Aqualevel Hi', text2=('temp: ' + str(self.get_temp())))
