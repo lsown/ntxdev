@@ -62,7 +62,7 @@ class aquarium:
             'wasteFlag' : {'name' : 'wasteFlag', 'pinType': 'levelSensor', 'state' : 0, 'pin' : 6},
             'cleanFlag' : {'name' : 'cleanFlag', 'pinType': 'levelSensor', 'state' : 0, 'pin' : 19},
             'aquaFlag' : {'name' : 'aquaFlag', 'pinType': 'levelSensor', 'state' : 0, 'pin' : 13},
-            'spareflag' : {'name' : 'spareFlag', 'pinType': 'levelSensor', 'state' : 0, 'pin' : 26},
+            'spareFlag' : {'name' : 'spareFlag', 'pinType': 'levelSensor', 'state' : 0, 'pin' : 26},
             'FAULTn1' : {'name' : 'FAULTn1', 'pinType': 'motor', 'state' : 0, 'pin' : 17},
             'FAULTn2' : {'name' : 'FAULTn2', 'pinType': 'motor', 'state' : 0, 'pin' : 27},
             'FAULTn3' : {'name' : 'FAULTn3', 'pinType': 'motor', 'state' : 0, 'pin' : 22},
@@ -94,11 +94,11 @@ class aquarium:
 
         for i in self.pinsOut:
             GPIO.setup(self.pinsOut[i]['pin'], GPIO.OUT, initial = self.pinsOut[i]['state']) #set GPIO as OUT, configure initial value
-            print('%s configured as OUTPUT %s' %(str(self.pinsOut[i]['pin']), self.pinsOut[i]['state']))
+            print('%s pin %s configured as OUTPUT %s' %(self.pinsOut[i]['name'], str(self.pinsOut[i]['pin']), self.pinsOut[i]['state']))
 
         for i in self.pinsIn:
             GPIO.setup(self.pinsIn[i]['pin'], GPIO.IN) #set GPIO as INPUT
-            print('Pin %s configured as INPUT' %(str(self.pinsIn[i]['pin'])))
+            print('%s pin %s configured as INPUT' %(self.pinsIn[i]['name'], str(self.pinsIn[i]['pin'])))
 
             self.pinsIn[i]['state'] = GPIO.input(self.pinsIn[i]['pin'])
             print('%s initial state is %s' %(self.pinsIn[i]['name'], str(self.pinsIn[i]['state'])))
