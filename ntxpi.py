@@ -157,7 +157,7 @@ class aquarium:
         if GPIO.input(channel) == 1:
             for i in self.pinsIn:
                 if self.pinsIn[i]['pin']== GPIO.input(channel): #set state to the input
-                    print("%s state set to %s" %(self.pinsIn[channel]['name'], str(self.pinsIn[channel]['state']))) # debug
+                    print("%s state set to %s" %(self.pinsIn[i]['name'], str(self.pinsIn[i]['state']))) # debug
                     if channel == self.pinsIn['aquaFlag']['pin']:
                         print('aqualvl went high, turning off motors')
                         self.motorControl(name='drv0', speed=0, direction = 'brake')
