@@ -159,7 +159,7 @@ class aquarium:
             for i in self.pinsIn:
                 if channel == self.pinsIn[i]['pin']:
                     self.pinsIn[i]['state'] = 1
-                    print('%s triggered HI, %s configured state to 1' %(self.pinsIn[i]['name'])) # debug
+                    print('%s triggered HI, %s configured state to 1' %(str(channel), self.pinsIn[i]['name'])) # debug
             print(time.time())
             self.motorControl(name='drv0', speed=0, direction = 'brake')
             self.display.drawStatus(text1='Aqualevel Hi', text2=('temp: ' + str(self.get_temp())))
