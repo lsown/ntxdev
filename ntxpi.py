@@ -154,16 +154,16 @@ class aquarium:
             self.buttonTime = time.time() #sets a time for last button press
 
     def levelSensor(self, channel):
-        if GPIO.input(channel['pin']) == 1:
+        if GPIO.input(channel) == 1:
             self.pinsIn[channel]['state'] = GPIO.input(channel['pin']) #set state to the input
             print("%s state set to %s" %(self.pinsIn[channel]['name'], str(self.pinsIn[channel]['state']))) # debug
-            if self.pinsIn[channel]['name'] == 'aquaFlag':
+            if channel == self.pinsIn['aquaFlag']['pin']:
                 print('aqualvl went high, turning off motors')
                 self.motorControl(name='drv0', speed=0, direction = 'brake')
                 self.display.drawStatus(text1='Aqualevel Hi', text2=('temp: ' + str(self.get_temp())))
-        if GPIO.input(channel['pin']) == 0:
+        if GPIO.input(channel) == 0:
             self.pinsIn[channel]['state'] = 0
-            print("pin state set to %s" %(self.pinsIn[channel]['name'], str(self.pinsIn[channel]['state']))) # debug
+            print("%s pin state set to %s" %(self.pinsIn[channel]['name'], str(self.pinsIn[channel]['state']))) # debug
  
 
     def resetState(self, channel):
