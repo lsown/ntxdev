@@ -94,7 +94,7 @@ class aquarium:
 
         for i in self.pinsOut:
             GPIO.setup(self.pinsOut[i]['pin'], GPIO.OUT, initial = self.pinsOut[i]['state']) #set GPIO as OUT, configure initial value
-            print('%s configured as OUTPUT %s' %(str(self.pinsIn[i]['pin']), self.pinsOut[i]['state']))
+            print('%s configured as OUTPUT %s' %(str(self.pinsOut[i]['pin']), self.pinsOut[i]['state']))
 
         for i in self.pinsIn:
             GPIO.setup(self.pinsIn[i]['pin'], GPIO.IN) #set GPIO as INPUT
