@@ -169,12 +169,9 @@ class aquarium:
                     print('%s triggered HI, %s configured state to %s' %(str(channel), self.pinsIn[i]['name'], self.pinsIn[i]['state'])) # debug
             """
             self.motorControl(name='drv0', speed=0, direction = 'brake')
-            self.display.drawStatus(text1='Aqualevel Hi', text2=('temp: ' + str(self.get_temp())))
+            #self.display.drawStatus(text1='Aqualevel Hi', text2=('temp: ' + str(self.get_temp())))
         if GPIO.input(channel) == 0:
-            for i in self.pinsIn:
-                if channel == self.pinsIn[i]['pin']:
-                    self.pinsIn[i]['state'] = 0
-                    print('%s triggered LOW, %s configured state to %s' %(str(channel), self.pinsIn[i]['name'], self.pinsIn[i]['state']))
+            self.setState(channel, 0)
 
     def resetState(self, channel):
         self.pinsIn[channel]['state'] = 0
