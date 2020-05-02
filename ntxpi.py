@@ -142,7 +142,7 @@ class aquarium:
                 print('%s triggered HI, %s configured state to %s' %(str(channel), self.pinsIn[i]['name'], self.pinsIn[i]['state'])) # debug
 
     def buttonPress(self, channel):
-        print('button press detected: prior state was %s' %(str(self.pinsIn[channel]['priorState'])))
+        print('button press detected: prior state was %s' %(str(self.pinsIn['buttonSig']['priorState'])))
         if ((time.time() - self.buttonTime) > 1):    
             self.setState(channel, 1)
             if self.pinsIn['buttonSig']['priorState'] == 0:
@@ -156,7 +156,7 @@ class aquarium:
 
                 self.motorControl(name='drv0', speed = 0, direction = 'brake')
                 #self.display.drawStatus(text1='idle', text2=('temp: %s' %(str(self.get_temp()))))
-            print('LED state changed to ' + str(self.pinsIn[channel]['priorState']))
+            print('LED state changed to %s' %(str(self.pinsIn['buttonSig']['priorState'])))
             self.buttonTime = time.time() #sets a time for last button press
 
     def levelSensor(self, channel):
