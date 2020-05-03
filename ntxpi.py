@@ -35,8 +35,8 @@ button - we may want to add 0.1 uF to c7. Hi when button depressed.
 
 class aquarium:
     def __init__(self):
-        
-        logging.basicConfig(format="%(asctime)s: %(message)s", level=logging.DEBUG, datefmt="%H:%M:%S")
+
+        #logging.basicConfig(format="%(asctime)s: %(message)s", level=logging.DEBUG, datefmt="%H:%M:%S")
         self.aquariumID = 100
         self.buttonTime = 0
 
