@@ -211,7 +211,7 @@ class aquarium:
     def drv8825(self, frequency, direction, steps, disable = False, stepEnPin = 20, stepDirPin = 21, stepStepPin = 18):
         if disable == True: #disables motor
             GPIO.output(stepEnPin, 1)
-            logging.info(msg = "disabled logged, turning motor off")
+            #logging.info(msg = "disabled logged, turning motor off")
         else:
             stepTime = 1/frequency/2 #duration for high, duration for low
             totalTime = 1/frequency * steps #calculates total estimated time for routine to finish
