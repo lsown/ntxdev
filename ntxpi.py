@@ -177,10 +177,25 @@ class aquarium:
         if GPIO.input(channel) == 0:
             self.updateState(channel, 0)
 
-    def resetState(self, channel):
-        self.pinsIn[channel]['state'] = 0
-        print("pin state set to %s" %(self.pinsIn[channel]['state'])) # debug
-
+    def drv8825(self, frequency, direction, steps, disable = False, stepEnPin = 20, stepDirPin = 21, stepStepPin = 18):
+        if disable == True: #disables motor
+            GPIO.output(stepEnPin, 1)
+            print("motor disable triggered, turning motor off")
+        else:
+            stepTime = 1/frequency/2 #duration for high, duration for low
+            totalTime = 1/frequency * steps #calculates total estimated time for routine to finish
+            GPIO.output(stepDirPin, direction)
+            GPIO.output(stepEnPin, 0) #LOW enable drv8825 chip
+            print("Stepper enabled, estimated time %s" %(str(totalTime)))
+            count = 0
+            while count <= steps:
+                GPIO.output(stepStepPin, 1)
+                time.sleep(stepTime)
+                GPIO.output(stepStepPin,0)
+                time.sleep(stepTime)
+                count += 1
+            GPIO.output(stepEnPin,1) #disable stepper power
+            print("Steppers finished %s steps at frequency %s, stepper disabled" % (count-1, frequency))
 
     def motorFault(self, channel):
         #GPIO.add_event_detect(channel, GPIO.RISING, callback=my_callback, bouncetime=200)
@@ -207,31 +222,6 @@ class aquarium:
         self.motors[name]['direction'] = direction
         self.motors[name]['state'] = (direction + " direction @ speed " + str(speed))
 
-    def drv8825(self, frequency, direction, steps, disable = False, stepEnPin = 20, stepDirPin = 21, stepStepPin = 18):
-        if disable == True: #disables motor
-            GPIO.output(stepEnPin, 1)
-            #logging.info(msg = "disabled logged, turning motor off")
-        else:
-            stepTime = 1/frequency/2 #duration for high, duration for low
-            totalTime = 1/frequency * steps #calculates total estimated time for routine to finish
-            GPIO.output(stepDirPin, direction)
-            GPIO.output(stepEnPin, 0) #LOW enable drv8825 chip
-            print("Stepper enabled, estimated time %s" %(str(totalTime)))
-            count = 0
-            while count <= steps:
-                GPIO.output(stepStepPin, 1)
-                time.sleep(stepTime)
-                GPIO.output(stepStepPin,0)
-                time.sleep(stepTime)
-                count += 1
-            print("Steppers finished %s steps at frequency %s" % (count-1, frequency))
-            GPIO.output(stepEnPin,1) #disable stepper power
-            print("Stepper disabled")
-
-    def exitCounter(self, count, steps, pin = 23):
-        if GPIO.input(pin) == 1:
-            count = steps
-            return count
 
 '''
 class myThread (threading.Thread):
