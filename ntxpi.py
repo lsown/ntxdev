@@ -207,6 +207,7 @@ class aquarium:
         GPIO.output(stepDirPin, direction)
         GPIO.output(stepEnPin, 0) #LOW enable drv8825 chip
         print("Stepper enabled, estimated time %s" %(str(totalTime)))
+        timer = time.time()
         count = 0
         while count <= steps:
             GPIO.output(stepStepPin, 1)
@@ -214,8 +215,9 @@ class aquarium:
             GPIO.output(stepStepPin,0)
             time.sleep(stepTime)
             count += 1
-            if GPIO.input(23) == 1:
-                break
+            if time.time() - timer > 1:
+                if GPIO.input(23) == 1:
+                    break
         print("Steppers finished %s steps at frequency %s" % (steps, frequency))
         GPIO.output(stepEnPin,1) #disable stepper power
         print("Stepper disabled")
