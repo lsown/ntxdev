@@ -95,6 +95,7 @@ class aquarium:
         
         self.displayThread = threading.Thread(target=self.stream_temp)
         self.displayThread.start()
+        self.displayThread.join()
 
     def piSetup(self): #Sets up GPIO pins, can also add to GPIO.in <pull_up_down=GPIO.PUD_UP>
 
@@ -145,7 +146,7 @@ class aquarium:
     def stream_temp(self):
         while True:
             self.get_temp()
-            self.display.drawStatus(text1='idle', text2=('temp: %s' %(str(self.get_temp()))))
+            self.display.drawStatus(text1='Temp Grab', text2=('temp: %s' %(str(self.get_temp()))))
             time.sleep(5)
 
 
@@ -170,7 +171,7 @@ class aquarium:
             else:
                 GPIO.output(self.pinsOut['LEDPwr']['pin'], 0)
                 self.pinsIn['buttonSig']['priorState'] = 0
-                self.display.drawStatus(text1='idle', text2=('temp: %s' %(str(self.get_temp()))))
+                self.display.drawStatus(text1='NTXPi Ready!', text2=('temp: %s' %(str(self.get_temp()))))
                 self.drv8825(0, 0, 0, disable=True)
                 #self.motorControl(name='drv0', speed = 0, direction = 'brake')
             print('LED state changed to %s' %(str(self.pinsIn['buttonSig']['priorState'])))
