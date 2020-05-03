@@ -93,9 +93,8 @@ class aquarium:
                 )
             )
         
-        self.displayThread = threading.Thread(target=self.stream_temp)
-        self.displayThread.start()
-        self.displayThread.join()
+        #self.displayThread = threading.Thread(target=self.stream_temp, daemon=True)
+        #self.displayThread.start()
 
     def piSetup(self): #Sets up GPIO pins, can also add to GPIO.in <pull_up_down=GPIO.PUD_UP>
 
