@@ -139,7 +139,7 @@ class aquarium:
         for i in self.pinsIn:
             if channel == self.pinsIn[i]['pin']:
                 self.pinsIn[i]['state'] = value
-                print('%s triggered HI, %s configured state to %s' %(str(channel), self.pinsIn[i]['name'], self.pinsIn[i]['state'])) # debug
+                print('%s pin triggered, %s configured state to %s' %(str(channel), self.pinsIn[i]['name'], self.pinsIn[i]['state'])) # debug
 
     def buttonPress(self, channel):
         print('button press detected: prior state was %s' %(str(self.pinsIn['buttonSig']['priorState'])))
@@ -149,25 +149,18 @@ class aquarium:
                 GPIO.output(self.pinsOut['LEDPwr']['pin'], 1)
                 self.pinsIn['buttonSig']['priorState'] = 1
                 self.motorControl(name='drv0', speed = 1, direction = 'forward')
-                #self.display.drawStatus(text1='pumping', text2=('temp: %s' %(str(self.get_temp()))))
+                self.display.drawStatus(text1='pumping', text2=('temp: %s' %(str(self.get_temp()))))
             else:
                 GPIO.output(self.pinsOut['LEDPwr']['pin'], 0)
                 self.pinsIn['buttonSig']['priorState'] = 0
-
                 self.motorControl(name='drv0', speed = 0, direction = 'brake')
-                #self.display.drawStatus(text1='idle', text2=('temp: %s' %(str(self.get_temp()))))
+                self.display.drawStatus(text1='idle', text2=('temp: %s' %(str(self.get_temp()))))
             print('LED state changed to %s' %(str(self.pinsIn['buttonSig']['priorState'])))
             self.buttonTime = time.time() #sets a time for last button press
 
     def levelSensor(self, channel):
         if GPIO.input(channel) == 1:
             self.setState(channel, 1)
-            """
-            for i in self.pinsIn:
-                if channel == self.pinsIn[i]['pin']:
-                    self.pinsIn[i]['state'] = 1
-                    print('%s triggered HI, %s configured state to %s' %(str(channel), self.pinsIn[i]['name'], self.pinsIn[i]['state'])) # debug
-            """
             self.motorControl(name='drv0', speed=0, direction = 'brake')
             self.display.drawStatus(text1='Aqualevel Hi', text2=('temp: ' + str(self.get_temp())))
         if GPIO.input(channel) == 0:
