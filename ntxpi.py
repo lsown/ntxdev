@@ -172,8 +172,9 @@ class aquarium:
     def levelSensor(self, channel):
         if GPIO.input(channel) == 1:
             self.updateState(channel, 1)
-            self.motorControl(name='drv0', speed=0, direction = 'brake')
-            self.display.drawStatus(text1='Aqualevel Hi', text2=('temp: ' + str(self.get_temp())))
+            #self.motorControl(name='drv0', speed=0, direction = 'brake')
+            self.drv8825(0,0,0,disable=True)
+            self.display.drawStatus(text1='Full Aquarium', text2=('temp: ' + str(self.get_temp())))
         if GPIO.input(channel) == 0:
             self.updateState(channel, 0)
 
@@ -210,7 +211,7 @@ class aquarium:
     def drv8825(self, frequency, direction, steps, disable = False, stepEnPin = 20, stepDirPin = 21, stepStepPin = 18):
         if disable == True: #disables motor
             GPIO.output(stepEnPin, 1)
-            logging.info("disabled logged, turning motor off")
+            logging.info(msg = "disabled logged, turning motor off")
         else:
             stepTime = 1/frequency/2 #duration for high, duration for low
             totalTime = 1/frequency * steps #calculates total estimated time for routine to finish
@@ -224,7 +225,7 @@ class aquarium:
                 GPIO.output(stepStepPin,0)
                 time.sleep(stepTime)
                 count += 1
-            print("Steppers finished %s steps at frequency %s" % (count, frequency))
+            print("Steppers finished %s steps at frequency %s" % (count-1, frequency))
             GPIO.output(stepEnPin,1) #disable stepper power
             print("Stepper disabled")
 
