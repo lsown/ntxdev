@@ -36,7 +36,7 @@ button - we may want to add 0.1 uF to c7. Hi when button depressed.
 class aquarium:
     def __init__(self):
 
-        #logging.basicConfig(format="%(asctime)s: %(message)s", level=logging.DEBUG, datefmt="%H:%M:%S")
+        logging.basicConfig(format="%(asctime)s: %(message)s", level=logging.DEBUG, datefmt="%H:%M:%S")
         self.aquariumID = 100
         self.buttonTime = 0
 
@@ -82,7 +82,7 @@ class aquarium:
             'drv1' : {'name' : 'containerPump', 'i2cAddress' : 0x61, 'speed' : 0, 'direction' : 'cw', 'faultpin' : 27, 'state' : 'cw: 0'},
             #'drv2' : {'name' : 'sparePump', 'i2cAddress' : 0x62, 'speed' : 0, 'direction' : 'cw', 'faultpin': 22}
         }
-
+        logging.info('initializing ntxpi')
         self.piSetup() #sets up the pi pin configurations
         self.drv8830Setup() #sets up the channels for i2c motor drivers
 
