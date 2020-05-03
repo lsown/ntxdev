@@ -82,13 +82,13 @@ class aquarium:
             'drv1' : {'name' : 'containerPump', 'i2cAddress' : 0x61, 'speed' : 0, 'direction' : 'cw', 'faultpin' : 27, 'state' : 'cw: 0'},
             #'drv2' : {'name' : 'sparePump', 'i2cAddress' : 0x62, 'speed' : 0, 'direction' : 'cw', 'faultpin': 22}
         }
-        logging.info('initializing ntxpi')
+        logging.info('Initializing NTXpi object')
         self.piSetup() #sets up the pi pin configurations
         self.drv8830Setup() #sets up the channels for i2c motor drivers
 
         self.display = i2cdisplay.display() #creates a display object
         self.display.drawStatus(
-            text1='Welcome!', 
+            text1='NTXPi Ready', 
             text2=('temp: %s' %(str(self.get_temp())) 
                 )
             )
@@ -97,22 +97,22 @@ class aquarium:
 
         for i in self.pinsOut:
             GPIO.setup(self.pinsOut[i]['pin'], GPIO.OUT, initial = self.pinsOut[i]['state']) #set GPIO as OUT, configure initial value
-            print('%s pin %s configured as OUTPUT %s' %(self.pinsOut[i]['name'], str(self.pinsOut[i]['pin']), self.pinsOut[i]['state']))
+            logging.info('%s pin %s configured as OUTPUT %s' %(self.pinsOut[i]['name'], str(self.pinsOut[i]['pin']), self.pinsOut[i]['state']))
 
         for i in self.pinsIn:
             GPIO.setup(self.pinsIn[i]['pin'], GPIO.IN) #set GPIO as INPUT
-            print('%s pin %s configured as INPUT' %(self.pinsIn[i]['name'], str(self.pinsIn[i]['pin'])))
+            logging.info('%s pin %s configured as INPUT' %(self.pinsIn[i]['name'], str(self.pinsIn[i]['pin'])))
 
             self.pinsIn[i]['state'] = GPIO.input(self.pinsIn[i]['pin'])
-            print('%s initial state is %s' %(self.pinsIn[i]['name'], str(self.pinsIn[i]['state'])))
+            logging.info('%s initial state is %s' %(self.pinsIn[i]['name'], str(self.pinsIn[i]['state'])))
 
             #configure event detections for pinType levelSensor & interface
             if self.pinsIn[i]['pinType'] == 'levelSensor':
                 GPIO.add_event_detect(self.pinsIn[i]['pin'], GPIO.BOTH, callback=self.levelSensor, bouncetime=500) 
-                print('%s set as levelSensor callback' %(str(self.pinsIn[i]['name'])))
+                logging.info('%s set as levelSensor callback' %(str(self.pinsIn[i]['name'])))
             elif self.pinsIn[i]['pinType'] == 'interface':
                 GPIO.add_event_detect(self.pinsIn[i]['pin'], GPIO.RISING, callback=self.buttonPress, bouncetime=500) 
-                print('%s set as button callback' %(str(self.pinsIn[i]['name'])))
+                logging.info('%s set as button callback' %(str(self.pinsIn[i]['name'])))
 
 
             #elif self.pinsIn[i]['pinType'] == 'motor':
@@ -201,7 +201,7 @@ class aquarium:
         #GPIO.add_event_detect(channel, GPIO.RISING, callback=my_callback, bouncetime=200)
         for i in self.motors:
             if self.motors[i]['faultpin'] == channel:
-                print("%s has tripped a fault" %(str(i)))
+                logging.info("%s has tripped a fault" %(str(i)))
 
     def motorControl(self, name='drv0', i2cAddress=0x60, speed=1, direction='forward'):
         if speed > 1:
