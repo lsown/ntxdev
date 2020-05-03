@@ -144,20 +144,20 @@ class aquarium:
 
     def buttonPress(self, channel):
         print('button press detected: prior state was %s' %(str(self.pinsIn['buttonSig']['priorState'])))
-        if ((time.time() - self.buttonTime) > 1):    
+        if ((time.time() - self.buttonTime) > 2):    
             self.setState(channel, 1)
             if self.pinsIn['buttonSig']['priorState'] == 0:
                 GPIO.output(self.pinsOut['LEDPwr']['pin'], 1)
                 self.pinsIn['buttonSig']['priorState'] = 1
-                self.drv8825(600, 1, 10000)
-                #self.motorControl(name='drv0', speed = 1, direction = 'forward')
                 self.display.drawStatus(text1='pumping', text2=('temp: %s' %(str(self.get_temp()))))
+                self.drv8825(frequency = 600, direction = 1, steps = 10000)
+                #self.motorControl(name='drv0', speed = 1, direction = 'forward') 
             else:
                 GPIO.output(self.pinsOut['LEDPwr']['pin'], 0)
                 self.pinsIn['buttonSig']['priorState'] = 0
+                self.display.drawStatus(text1='idle', text2=('temp: %s' %(str(self.get_temp()))))
                 self.drv8825(600, 1, 0)
                 #self.motorControl(name='drv0', speed = 0, direction = 'brake')
-                self.display.drawStatus(text1='idle', text2=('temp: %s' %(str(self.get_temp()))))
             print('LED state changed to %s' %(str(self.pinsIn['buttonSig']['priorState'])))
             self.buttonTime = time.time() #sets a time for last button press
         global exit_loop
@@ -218,7 +218,7 @@ class aquarium:
             if time.time() - timer > 2:
                 if GPIO.input(23) == 1:
                     break
-        print("Steppers finished %s steps at frequency %s" % (steps, frequency))
+        print("Steppers finished %s steps at frequency %s" % (count, frequency))
         GPIO.output(stepEnPin,1) #disable stepper power
         print("Stepper disabled")
 
