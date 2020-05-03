@@ -152,7 +152,7 @@ class aquarium:
             if self.pinsIn['buttonSig']['priorState'] == 0:
                 GPIO.output(self.pinsOut['LEDPwr']['pin'], 1)
                 self.pinsIn['buttonSig']['priorState'] = 1
-                self.display.drawStatus(text1='pumping', text2=('temp: %s' %(str(self.get_temp()))))
+                #self.display.drawStatus(text1='pumping', text2=('temp: %s' %(str(self.get_temp()))))
                 motorThread = threading.Thread(target=self.drv8825, args=(600,1,10000,), daemon=True)
                 motorThread.start()
                 #self.drv8825(frequency = 600, direction = 1, steps = 10000)
@@ -160,7 +160,7 @@ class aquarium:
             else:
                 GPIO.output(self.pinsOut['LEDPwr']['pin'], 0)
                 self.pinsIn['buttonSig']['priorState'] = 0
-                self.display.drawStatus(text1='idle', text2=('temp: %s' %(str(self.get_temp()))))
+                #self.display.drawStatus(text1='idle', text2=('temp: %s' %(str(self.get_temp()))))
                 self.drv8825(0, 0, 0, disable=True)
                 #self.motorControl(name='drv0', speed = 0, direction = 'brake')
             print('LED state changed to %s' %(str(self.pinsIn['buttonSig']['priorState'])))
