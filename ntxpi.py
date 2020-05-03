@@ -214,9 +214,16 @@ class aquarium:
             GPIO.output(stepStepPin,0)
             time.sleep(stepTime)
             count += 1
+            count = self.exitCounter(count, steps, 23)
         print("Steppers finished %s steps at frequency %s" % (steps, frequency))
         GPIO.output(stepEnPin,1) #disable stepper power
         print("Stepper disabled")
+
+    def exitCounter(self, count, steps, pin = 23):
+        if GPIO.input(pin) == 1:
+            count = steps
+            return count
+
 '''
 class myThread (threading.Thread):
    def __init__(self, threadID, name, counter, functionPass):
