@@ -92,6 +92,9 @@ class aquarium:
             text2=('temp: %s' %(str(self.get_temp())) 
                 )
             )
+        
+        self.displayThread = threading.Thread(target=self.stream_temp)
+        self.displayThread.start()
 
     def piSetup(self): #Sets up GPIO pins, can also add to GPIO.in <pull_up_down=GPIO.PUD_UP>
 
@@ -138,6 +141,13 @@ class aquarium:
 
     def get_temp(self):
         return self.aqtemp.read_temp()[0]
+
+    def stream_temp(self):
+        while True:
+            self.get_temp()
+            self.display.drawStatus(text1='idle', text2=('temp: %s' %(str(self.get_temp()))))
+            time.sleep(5)
+
 
     def updateState(self, channel, value):
         for i in self.pinsIn:
