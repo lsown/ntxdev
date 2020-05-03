@@ -204,7 +204,7 @@ class aquarium:
         self.motors[name]['state'] = (direction + " direction @ speed " + str(speed))
 
     def drv8825(self, frequency, direction, steps, disable = False, stepEnPin = 20, stepDirPin = 21, stepStepPin = 18):
-        if disable = True: #disables motor
+        if disable == True: #disables motor
             GPIO.output(stepEnPin, 1)
         else:
             stepTime = 1/frequency/2 #duration for high, duration for low
