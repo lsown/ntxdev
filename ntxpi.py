@@ -167,11 +167,11 @@ class aquarium:
 
     def levelSensor(self, channel):
         if GPIO.input(channel) == 1:
-            self.setState(channel, 1)
+            self.updateState(channel, 1)
             self.motorControl(name='drv0', speed=0, direction = 'brake')
             self.display.drawStatus(text1='Aqualevel Hi', text2=('temp: ' + str(self.get_temp())))
         if GPIO.input(channel) == 0:
-            self.setState(channel, 0)
+            self.updateState(channel, 0)
 
     def resetState(self, channel):
         self.pinsIn[channel]['state'] = 0
@@ -220,9 +220,11 @@ class aquarium:
                 GPIO.output(stepStepPin,0)
                 time.sleep(stepTime)
                 count += 1
+                '''
                 if time.time() - timer > 2:
                     if GPIO.input(23) == 1:
                         break
+                '''
             print("Steppers finished %s steps at frequency %s" % (count, frequency))
             GPIO.output(stepEnPin,1) #disable stepper power
             print("Stepper disabled")
