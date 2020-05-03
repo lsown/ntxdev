@@ -214,7 +214,8 @@ class aquarium:
             GPIO.output(stepStepPin,0)
             time.sleep(stepTime)
             count += 1
-            count = self.exitCounter(count, steps, 23)
+            if GPIO.input(23) == 1:
+                break
         print("Steppers finished %s steps at frequency %s" % (steps, frequency))
         GPIO.output(stepEnPin,1) #disable stepper power
         print("Stepper disabled")
