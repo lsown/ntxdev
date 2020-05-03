@@ -108,10 +108,10 @@ class aquarium:
 
             #configure event detections for pinType levelSensor & interface
             if self.pinsIn[i]['pinType'] == 'levelSensor':
-                GPIO.add_event_detect(self.pinsIn[i]['pin'], GPIO.BOTH, callback=self.levelSensor, bouncetime=200) 
+                GPIO.add_event_detect(self.pinsIn[i]['pin'], GPIO.BOTH, callback=self.levelSensor, bouncetime=500) 
                 print('%s set as levelSensor callback' %(str(self.pinsIn[i]['name'])))
             elif self.pinsIn[i]['pinType'] == 'interface':
-                GPIO.add_event_detect(self.pinsIn[i]['pin'], GPIO.RISING, callback=self.buttonPress, bouncetime=200) 
+                GPIO.add_event_detect(self.pinsIn[i]['pin'], GPIO.RISING, callback=self.buttonPress, bouncetime=500) 
                 print('%s set as button callback' %(str(self.pinsIn[i]['name'])))
 
 
