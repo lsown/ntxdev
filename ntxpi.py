@@ -13,6 +13,8 @@ GPIO.setmode(GPIO.BCM)
 import drv8830 #motor drive library
 import i2cdisplay
 
+logging.basicConfig(format=format, level=logging.DEBUG, datefmt="%H:%M:%S")
+
 #fake rpi objects - use these when rpi not available
 """
 #note this is a local pointer, adjust reference locale as needed.
@@ -109,7 +111,7 @@ class aquarium:
                 GPIO.add_event_detect(self.pinsIn[i]['pin'], GPIO.BOTH, callback=self.levelSensor, bouncetime=200) 
                 print('%s set as levelSensor callback' %(str(self.pinsIn[i]['name'])))
             elif self.pinsIn[i]['pinType'] == 'interface':
-                GPIO.add_event_detect(self.pinsIn[i]['pin'], GPIO.RISING, callback=self.buttonPress, bouncetime=300) 
+                GPIO.add_event_detect(self.pinsIn[i]['pin'], GPIO.RISING, callback=self.buttonPress, bouncetime=200) 
                 print('%s set as button callback' %(str(self.pinsIn[i]['name'])))
 
 
@@ -145,7 +147,7 @@ class aquarium:
 
     def buttonPress(self, channel):
         print('button press detected: prior state was %s' %(str(self.pinsIn['buttonSig']['priorState'])))
-        if ((time.time() - self.buttonTime) > 2):    
+        if ((time.time() - self.buttonTime) > 1):
             self.updateState(channel, 1)
             if self.pinsIn['buttonSig']['priorState'] == 0:
                 GPIO.output(self.pinsOut['LEDPwr']['pin'], 1)
@@ -207,14 +209,13 @@ class aquarium:
     def drv8825(self, frequency, direction, steps, disable = False, stepEnPin = 20, stepDirPin = 21, stepStepPin = 18):
         if disable == True: #disables motor
             GPIO.output(stepEnPin, 1)
-            logging.info("motor disabled")
+            logging.info("disabled logged, turning motor off")
         else:
             stepTime = 1/frequency/2 #duration for high, duration for low
             totalTime = 1/frequency * steps #calculates total estimated time for routine to finish
             GPIO.output(stepDirPin, direction)
             GPIO.output(stepEnPin, 0) #LOW enable drv8825 chip
             print("Stepper enabled, estimated time %s" %(str(totalTime)))
-            timer = time.time()
             count = 0
             while count <= steps:
                 GPIO.output(stepStepPin, 1)
@@ -222,11 +223,6 @@ class aquarium:
                 GPIO.output(stepStepPin,0)
                 time.sleep(stepTime)
                 count += 1
-                '''
-                if time.time() - timer > 2:
-                    if GPIO.input(23) == 1:
-                        break
-                '''
             print("Steppers finished %s steps at frequency %s" % (count, frequency))
             GPIO.output(stepEnPin,1) #disable stepper power
             print("Stepper disabled")
