@@ -215,7 +215,7 @@ class aquarium:
             GPIO.output(stepStepPin,0)
             time.sleep(stepTime)
             count += 1
-            if time.time() - timer > 1:
+            if time.time() - timer > 10:
                 if GPIO.input(23) == 1:
                     break
         print("Steppers finished %s steps at frequency %s" % (steps, frequency))
