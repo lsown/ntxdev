@@ -5,6 +5,7 @@ import time
 from datetime import datetime
 import threading
 import random
+import logging
 
 #Rpi related objects
 from RPi import GPIO as GPIO
@@ -158,7 +159,7 @@ class aquarium:
                 GPIO.output(self.pinsOut['LEDPwr']['pin'], 0)
                 self.pinsIn['buttonSig']['priorState'] = 0
                 self.display.drawStatus(text1='idle', text2=('temp: %s' %(str(self.get_temp()))))
-                self.drv8825(600, 1, 0)
+                self.drv8825(0, 0, 0, disable=True)
                 #self.motorControl(name='drv0', speed = 0, direction = 'brake')
             print('LED state changed to %s' %(str(self.pinsIn['buttonSig']['priorState'])))
             self.buttonTime = time.time() #sets a time for last button press
@@ -206,6 +207,7 @@ class aquarium:
     def drv8825(self, frequency, direction, steps, disable = False, stepEnPin = 20, stepDirPin = 21, stepStepPin = 18):
         if disable == True: #disables motor
             GPIO.output(stepEnPin, 1)
+            logging.info("motor disabled")
         else:
             stepTime = 1/frequency/2 #duration for high, duration for low
             totalTime = 1/frequency * steps #calculates total estimated time for routine to finish
