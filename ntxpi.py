@@ -117,10 +117,6 @@ class aquarium:
                 #GPIO.add_event_detect(pin, GPIO.FALLING, callback=self.motorFault, bouncetime=100) 
                 #print(str(self.pinsIn[i]['pin']) + ' set as motor callback')
 
-    def breakLoop(self, channel):
-        global exit_loop
-        exit_loop = True
-
     def drv8830Setup(self):
         self.drv0 = drv8830.DRV8830(i2c_addr=0x60)
         self.drv1 = drv8830.DRV8830(i2c_addr=0x61)
@@ -165,6 +161,8 @@ class aquarium:
                 self.display.drawStatus(text1='idle', text2=('temp: %s' %(str(self.get_temp()))))
             print('LED state changed to %s' %(str(self.pinsIn['buttonSig']['priorState'])))
             self.buttonTime = time.time() #sets a time for last button press
+        global exit_loop
+        exit_loop = True
 
     def levelSensor(self, channel):
         if GPIO.input(channel) == 1:
