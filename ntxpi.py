@@ -201,11 +201,8 @@ class aquarium:
     def drv8825(self, frequency, direction, steps, stepEnPin = 20, stepDirPin = 21, stepStepPin = 18):
         stepTime = 1/frequency/2 #duration for high, duration for low
         totalTime = 1/frequency * steps #calculates total estimated time for routine to finish
-        if direction == 1:
-            GPIO.output(stepDirPin, 1)
-        else:
-            GPIO.output(stepDirPin, 0)
-        GPIO.output(stepEnPin, 0) #enable drv8825 chip
+        GPIO.output(stepDirPin, direction)
+        GPIO.output(stepEnPin, 0) #LOW enable drv8825 chip
         print("Stepper enabled, estimated time %s" %(str(totalTime)))
         count = 0
         while count <= steps:
