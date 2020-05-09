@@ -121,7 +121,7 @@ class aquarium:
             #elif self.pinsIn[i]['pinType'] == 'motor':
                 #GPIO.add_event_detect(pin, GPIO.FALLING, callback=self.motorFault, bouncetime=100) 
                 #print(str(self.pinsIn[i]['pin']) + ' set as motor callback')
-
+    
     def drv8830Setup(self):
         self.drv0 = drv8830.DRV8830(i2c_addr=0x60)
         self.drv1 = drv8830.DRV8830(i2c_addr=0x61)
@@ -147,7 +147,6 @@ class aquarium:
             self.get_temp()
             self.display.drawStatus(text1='Temp Grab', text2=('temp: %s' %(str(self.get_temp()))))
             time.sleep(5)
-
 
     def updateState(self, channel, value):
         for i in self.pinsIn:
@@ -187,9 +186,9 @@ class aquarium:
         if GPIO.input(channel) == 0:
             self.updateState(channel, 0)
 
-    def drv8825(self, frequency, direction, steps, disable = False, stepEnPin = 20, stepDirPin = 21, stepStepPin = 18):
+    def drv8825(self, frequency, direction, steps, disable = False, dutyCycle = 50, stepEnPin = 20, stepDirPin = 21, stepStepPin = 18):
         if disable == True: #disables motor
-            GPIO.output(stepEnPin, 1)
+            GPIO.output(stepEnPin, 1) #disables motor power by pulling pin HI
             logging.info("motor disable triggered, turning motor off")
         else:
             stepTime = 1/frequency/2 #duration for high, duration for low
@@ -245,3 +244,59 @@ class myThread (threading.Thread):
       self.functionPass
       print("Exiting thread: " + self.name)
 '''
+
+class stepMotor:
+    def __init__(self, frequency, direction, steps, disable = False, dutyCycle = 50, stepEnPin = 20, stepDirPin = 21, stepStepPin = 18):
+        self.frequency = frequency
+        self.direction = direction
+        self.steps = steps
+        self.disable = disable
+        self.dutyCycle = dutyCycle #default 50%
+        self.stepEnPin = 20
+        self.stepDirPin = 21
+        self.stepStepPin = 18
+        
+        self.pwm = GPIO.pwm(self.stepStepPin, self.frequency) #initializes pwm object
+
+    def calculateTime(self, frequency, steps):
+        stepTime = 1/frequency/2 #duration for high, duration for low
+        totalTime = 1/frequency * steps #calculates total estimated time for routine to finish
+        logging.info("Stepper enabled, estimated time %s" %(str(totalTime)))
+        return [stepTime, totalTime]
+
+    def setDirection(self, direction):
+        if (direction == 0):
+            logging.info("set to cw")
+        if (direction == 1):
+            logging.info("set to ccw")
+
+    def enableMotor(self):
+        GPIO.output(self.stepEnPin, 0)
+        logging.info("motor enabled")
+
+    def disableMotor(self):
+        GPIO.output(self.stepEnPin, 1)
+        logging.info("motor disable triggered, turning motor off")
+
+    def changeFrequency(self, frequency):
+        self.frequency = frequency #update frequency of object
+        self.pwm.ChangeFrequency(frequency)
+        logging.info("Frequency changed to %s Hz" %(frequency))
+
+    def changeDutyCycle(self, dutyCycle):
+        self.dutyCycle = dutyCycle #update dutyCycle of object
+        self.pwm.ChangeDutyCycle(dutyCycle)
+        logging.info("Duty cycle changed %s percent" %(str(dutyCycle)))
+
+    def stepRequest(self, steps):
+        self.enableMotor()
+        totalTime = 1 / self.frequency * steps
+        timerThread = threading.Timer(totalTime, self.disableMotor)
+        self.pwm.start(self.dutyCycle)
+        timerThread.start()
+
+        
+                
+        
+
+
