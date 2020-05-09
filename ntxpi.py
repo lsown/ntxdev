@@ -163,7 +163,7 @@ class aquarium:
                 GPIO.output(self.pinsOut['LEDPwr']['pin'], 1)
                 self.pinsIn['buttonSig']['priorState'] = 1
                 self.display.drawStatus(text1='pumping', text2=('temp: %s' %(str(self.get_temp()))))
-                motorThread = threading.Thread(target=self.drv8825, args=(600,1,10000,), daemon=True)
+                motorThread = threading.Thread(target=self.drv8825, args=(600,0,10000,), daemon=True)
                 motorThread.start()
                 #self.drv8825(frequency = 600, direction = 1, steps = 10000)
                 #self.motorControl(name='drv0', speed = 1, direction = 'forward')
