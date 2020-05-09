@@ -85,7 +85,7 @@ class aquarium:
         logging.info('Initializing NTXpi object')
         self.piSetup() #sets up the pi pin configurations
         self.drv8830Setup() #sets up the channels for i2c motor drivers
-
+        self.stepMotor = stepMotor(500, 0)
         self.display = i2cdisplay.display() #creates a display object
         self.display.drawStatus(
             text1='NTXPi Ready', 
@@ -93,8 +93,8 @@ class aquarium:
                 )
             )
         
-        #self.displayThread = threading.Thread(target=self.stream_temp, daemon=True)
-        #self.displayThread.start()
+        self.displayThread = threading.Thread(target=self.stream_temp, daemon=True)
+        self.displayThread.start()
 
     def piSetup(self): #Sets up GPIO pins, can also add to GPIO.in <pull_up_down=GPIO.PUD_UP>
 
@@ -162,15 +162,22 @@ class aquarium:
                 GPIO.output(self.pinsOut['LEDPwr']['pin'], 1)
                 self.pinsIn['buttonSig']['priorState'] = 1
                 self.display.drawStatus(text1='pumping', text2=('temp: %s' %(str(self.get_temp()))))
+                self.stepMotor.stepInfinite()
+                '''
                 motorThread = threading.Thread(target=self.drv8825, args=(600,0,10000,), daemon=True)
                 motorThread.start()
+                '''
                 #self.drv8825(frequency = 600, direction = 1, steps = 10000)
                 #self.motorControl(name='drv0', speed = 1, direction = 'forward')
             else:
                 GPIO.output(self.pinsOut['LEDPwr']['pin'], 0)
                 self.pinsIn['buttonSig']['priorState'] = 0
                 self.display.drawStatus(text1='NTXPi Ready!', text2=('temp: %s' %(str(self.get_temp()))))
-                self.drv8825(0, 0, 0, disable=True)
+                
+                self.stepMotor.disableMotor()
+
+                #self.drv8825(0, 0, 0, disable=True)
+                
                 #self.motorControl(name='drv0', speed = 0, direction = 'brake')
             print('LED state changed to %s' %(str(self.pinsIn['buttonSig']['priorState'])))
             self.buttonTime = time.time() #sets a time for last button press
@@ -246,7 +253,7 @@ class myThread (threading.Thread):
 '''
 
 class stepMotor:
-    def __init__(self, frequency, direction, steps, disable = False, dutyCycle = 50, stepEnPin = 20, stepDirPin = 21, stepStepPin = 18):
+    def __init__(self, frequency, direction, steps=0, disable = False, dutyCycle = 50, stepEnPin = 20, stepDirPin = 21, stepStepPin = 18):
         self.frequency = frequency
         self.direction = direction
         self.steps = steps
@@ -264,21 +271,23 @@ class stepMotor:
         logging.info("Stepper estimated time %s" %(str(totalTime)))
         return [totalTime, stepTime]
 
-    def setDirection(self, direction):
-        if (direction == 0):
-            GPIO.output(self.stepDirPin, 0)
-            logging.info("set to cw")
-        if (direction == 1):
-            GPIO.output(self.stepDirPin, 1)
-            logging.info("set to ccw")
-
     def enableMotor(self):
         GPIO.output(self.stepEnPin, 0)
         logging.info("motor enabled")
 
     def disableMotor(self):
         GPIO.output(self.stepEnPin, 1)
-        logging.info("motor disable triggered, turning motor off")
+        logging.info("motor disabled")
+
+    def changeRotation(self, rotation):
+        if (rotation == 0):
+            GPIO.output(self.stepDirPin, 0)
+            self.direction = 0 #update direction of object
+            logging.info("set to cw, stepDirPin LOW")
+        else:
+            GPIO.output(self.stepDirPin, 1)
+            self.direction = 1 #update direction of object
+            logging.info("set to ccw, stepDirPin HI")
 
     def changeFrequency(self, frequency):
         self.frequency = frequency #update frequency of object
@@ -293,10 +302,15 @@ class stepMotor:
     def stepRequest(self, steps):
         self.enableMotor()
         totalTime = 1 / self.frequency * steps
-        logging.info("Estimated time for %s steps: %s" %(str(steps), str(totalTime)))
+        logging.info("Estimated time for %s steps @ %s: %s" %(str(steps), str(self.frequency), str(totalTime)))
         timerThread = threading.Timer(totalTime, self.disableMotor)
         self.pwm.start(self.dutyCycle)
         timerThread.start()
+
+    def stepInfinite(self):
+        self.enableMotor()
+        self.pwm.start(self.dutyCycle)
+
         
                 
         
