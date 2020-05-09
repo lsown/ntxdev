@@ -3,12 +3,16 @@ import os
 import glob
 import time
 from datetime import datetime
+import threading
+import random
+import logging
 
 #Rpi related objects
 from RPi import GPIO as GPIO
 GPIO.setmode(GPIO.BCM)
 import drv8830 #motor drive library
 import i2cdisplay
+
 
 #fake rpi objects - use these when rpi not available
 """
@@ -31,22 +35,40 @@ button - we may want to add 0.1 uF to c7. Hi when button depressed.
 
 class aquarium:
     def __init__(self):
-        
+
+        logging.basicConfig(format="%(asctime)s: %(message)s", level=logging.DEBUG, datefmt="%H:%M:%S")
         self.aquariumID = 100
         self.buttonTime = 0
+
+        #simulated version 
+        self.aqdict_sim = {
+            'temp': random.randrange(0, 50),
+            'drv0' : True if random.randrange(0,2) == 0 else False,
+            'drv1' : True if random.randrange(0,2) == 0 else False,
+            'drv0Spd' : 0,
+            'drv1Spd' : 0,
+            'aquaFlag' : random.randrange(0,2),
+            'cleanFlag' : random.randrange(0,2),
+            'wasteFlag' : random.randrange(0,2),
+            'spareFlag' : random.randrange(0,2),
+            'exchangeState' : False,
+            'tempmax' : 40,
+            'tempmin' : 10
+            }
+
         import onewiretemp as onewiretemp
         self.aqtemp = onewiretemp.onewiretemp() #creates an temp object
 
         self.pinsIn = {
             #5 : {'name' : 'lvlEN', 'pinType': 'levelSensor', 'state' : 0},
-            6 : {'name' : 'wastelvl', 'pinType': 'levelSensor', 'state' : 0},
-            19 : {'name' : 'cleanlvl', 'pinType': 'levelSensor', 'state' : 0},
-            13 : {'name' : 'aqualvl', 'pinType': 'levelSensor', 'state' : 0},
-            26 : {'name' : 'sparelvl', 'pinType': 'levelSensor', 'state' : 0},
-            17 : {'name' : 'FAULTn1', 'pinType': 'motor', 'state' : 0},
-            27 : {'name' : 'FAULTn2', 'pinType': 'motor', 'state' : 0},
-            22 : {'name' : 'FAULTn3', 'pinType': 'motor', 'state' : 0},
-            23 : {'name' : 'buttonSig', 'pinType': 'interface', 'state' : 0, 'priorState' : 0},
+            'buttonSig' : {'name' : 'buttonSig', 'pinType': 'interface', 'state' : 0, 'priorState' : 0, 'pin' : 23},
+            'wasteFlag' : {'name' : 'wasteFlag', 'pinType': 'levelSensor', 'state' : 0, 'pin' : 6},
+            'cleanFlag' : {'name' : 'cleanFlag', 'pinType': 'levelSensor', 'state' : 0, 'pin' : 19},
+            'aquaFlag' : {'name' : 'aquaFlag', 'pinType': 'levelSensor', 'state' : 0, 'pin' : 13},
+            'spareFlag' : {'name' : 'spareFlag', 'pinType': 'levelSensor', 'state' : 0, 'pin' : 26},
+            'FAULTn1' : {'name' : 'FAULTn1', 'pinType': 'motor', 'state' : 0, 'pin' : 17},
+            'FAULTn2' : {'name' : 'FAULTn2', 'pinType': 'motor', 'state' : 0, 'pin' : 27},
+            'FAULTn3' : {'name' : 'FAULTn3', 'pinType': 'motor', 'state' : 0, 'pin' : 22},
         }
         self.pinsOut = {
             #24 : {'name' : 'I2C RST', 'state' : 0},
@@ -60,91 +82,136 @@ class aquarium:
             'drv1' : {'name' : 'containerPump', 'i2cAddress' : 0x61, 'speed' : 0, 'direction' : 'cw', 'faultpin' : 27, 'state' : 'cw: 0'},
             #'drv2' : {'name' : 'sparePump', 'i2cAddress' : 0x62, 'speed' : 0, 'direction' : 'cw', 'faultpin': 22}
         }
-
+        logging.info('Initializing NTXpi object')
         self.piSetup() #sets up the pi pin configurations
         self.drv8830Setup() #sets up the channels for i2c motor drivers
 
         self.display = i2cdisplay.display() #creates a display object
         self.display.drawStatus(
-            text1='Welcome!', 
+            text1='NTXPi Ready', 
             text2=('temp: %s' %(str(self.get_temp())) 
                 )
             )
+        
+        #self.displayThread = threading.Thread(target=self.stream_temp, daemon=True)
+        #self.displayThread.start()
 
     def piSetup(self): #Sets up GPIO pins, can also add to GPIO.in <pull_up_down=GPIO.PUD_UP>
 
-        for pin in self.pinsOut:
-            GPIO.setup(self.pinsOut[pin]['pin'], GPIO.OUT, initial = self.pinsOut[pin]['state'])
-            print('0')
+        for i in self.pinsOut:
+            GPIO.setup(self.pinsOut[i]['pin'], GPIO.OUT, initial = self.pinsOut[i]['state']) #set GPIO as OUT, configure initial value
+            logging.info('%s pin %s configured as OUTPUT %s' %(self.pinsOut[i]['name'], str(self.pinsOut[i]['pin']), self.pinsOut[i]['state']))
 
-        for pin in self.pinsIn:
-            GPIO.setup(pin, GPIO.IN)
-            print(str(pin) + ' passed 1')
-            self.pinsIn[pin]['state'] = GPIO.input(pin)
-            print(str(pin) + ' passed 2')
+        for i in self.pinsIn:
+            GPIO.setup(self.pinsIn[i]['pin'], GPIO.IN) #set GPIO as INPUT
+            logging.info('%s pin %s configured as INPUT' %(self.pinsIn[i]['name'], str(self.pinsIn[i]['pin'])))
 
-            if self.pinsIn[pin]['pinType'] == 'levelSensor':
-                GPIO.add_event_detect(pin, GPIO.BOTH, callback=self.levelSensor, bouncetime=100) 
-                print(str(pin) + ' set as levelSensor callback')
-            elif self.pinsIn[pin]['pinType'] == 'motor':
-                GPIO.add_event_detect(pin, GPIO.FALLING, callback=self.motorFault, bouncetime=100) 
-                print(str(pin) + ' set as motor callback')
-            elif self.pinsIn[pin]['pinType'] == 'interface':
-                GPIO.add_event_detect(pin, GPIO.RISING, callback=self.buttonPress, bouncetime=100) 
-                print(str(pin) + ' set as button callback')
-            print(str(pin) + ' passed 3')
+            self.pinsIn[i]['state'] = GPIO.input(self.pinsIn[i]['pin'])
+            logging.info('%s initial state is %s' %(self.pinsIn[i]['name'], str(self.pinsIn[i]['state'])))
+
+            #configure event detections for pinType levelSensor & interface
+            if self.pinsIn[i]['pinType'] == 'levelSensor':
+                GPIO.add_event_detect(self.pinsIn[i]['pin'], GPIO.BOTH, callback=self.levelSensor, bouncetime=500) 
+                logging.info('%s set as levelSensor callback' %(str(self.pinsIn[i]['name'])))
+            elif self.pinsIn[i]['pinType'] == 'interface':
+                GPIO.add_event_detect(self.pinsIn[i]['pin'], GPIO.RISING, callback=self.buttonPress, bouncetime=500) 
+                logging.info('%s set as button callback' %(str(self.pinsIn[i]['name'])))
+
+
+            #elif self.pinsIn[i]['pinType'] == 'motor':
+                #GPIO.add_event_detect(pin, GPIO.FALLING, callback=self.motorFault, bouncetime=100) 
+                #print(str(self.pinsIn[i]['pin']) + ' set as motor callback')
 
     def drv8830Setup(self):
         self.drv0 = drv8830.DRV8830(i2c_addr=0x60)
         self.drv1 = drv8830.DRV8830(i2c_addr=0x61)
         #self.drv2 = drv8830.DRV8830(i2c_addr=0x62) #note, change HW to 0x63 to work with library
 
+    def get_status(self):
+        return {
+            'temp': self.get_temp(), #0 is celcius, 1 is farenheit
+            'motor1' : self.motors['drv0']['state'],
+            'motor2' : self.motors['drv0']['state'],
+            'aquaFlag' : self.pinsIn['aquaFlag']['state'],
+            'cleanFlag' : self.pinsIn['cleanFlag']['state'],
+            'wasteFlag' : self.pinsIn['wasteFlag']['state'],
+            'spareFlag' : self.pinsIn['spareFlag']['state'],
+            'time' : datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
+        } #0 is celcius, 1 is farenheit
+
+    def get_temp(self):
+        return self.aqtemp.read_temp()[0]
+
+    def stream_temp(self):
+        while True:
+            self.get_temp()
+            self.display.drawStatus(text1='Temp Grab', text2=('temp: %s' %(str(self.get_temp()))))
+            time.sleep(5)
+
+
+    def updateState(self, channel, value):
+        for i in self.pinsIn:
+            if channel == self.pinsIn[i]['pin']:
+                self.pinsIn[i]['state'] = value
+                print('%s pin triggered, %s configured state to %s' %(str(channel), self.pinsIn[i]['name'], self.pinsIn[i]['state'])) # debug
+
     def buttonPress(self, channel):
-        print('button press detected: prior state was %s' %(str(self.pinsIn[channel]['priorState'])))
-        if ((time.time() - self.buttonTime) > 1):    
-            self.pinsIn[channel]['state'] = GPIO.input(channel) #set state to 1
-            if self.pinsIn[channel]['priorState'] == 0:
+        print('button press detected: prior state was %s' %(str(self.pinsIn['buttonSig']['priorState'])))
+        if ((time.time() - self.buttonTime) > 1):
+            self.updateState(channel, 1)
+            if self.pinsIn['buttonSig']['priorState'] == 0:
                 GPIO.output(self.pinsOut['LEDPwr']['pin'], 1)
-                self.pinsIn[channel]['priorState'] = 1
-                self.motorControl(name='drv0', speed = 1, direction = 'forward')
+                self.pinsIn['buttonSig']['priorState'] = 1
                 self.display.drawStatus(text1='pumping', text2=('temp: %s' %(str(self.get_temp()))))
+                motorThread = threading.Thread(target=self.drv8825, args=(600,0,10000,), daemon=True)
+                motorThread.start()
+                #self.drv8825(frequency = 600, direction = 1, steps = 10000)
+                #self.motorControl(name='drv0', speed = 1, direction = 'forward')
             else:
                 GPIO.output(self.pinsOut['LEDPwr']['pin'], 0)
-                self.pinsIn[channel]['priorState'] = 0
-                self.motorControl(name='drv0', speed = 0, direction = 'brake')
-                self.display.drawStatus(text1='idle', text2=('temp: %s' %(str(self.get_temp()))))
-            print('LED state changed to ' + str(self.pinsIn[channel]['priorState']))
+                self.pinsIn['buttonSig']['priorState'] = 0
+                self.display.drawStatus(text1='NTXPi Ready!', text2=('temp: %s' %(str(self.get_temp()))))
+                self.drv8825(0, 0, 0, disable=True)
+                #self.motorControl(name='drv0', speed = 0, direction = 'brake')
+            print('LED state changed to %s' %(str(self.pinsIn['buttonSig']['priorState'])))
             self.buttonTime = time.time() #sets a time for last button press
+        global exit_loop
+        exit_loop = True
 
     def levelSensor(self, channel):
-        self.pinsIn[channel]['state'] = GPIO.input(channel) #set state to 1
-        if self.pinsIn[channel]['state'] == 1:
-            print("pin state set to %s" %(str(self.pinsIn[channel]['state']))) # debug
-            if self.pinsIn[channel]['name'] == 'wastelvl':
-                print('wastelvl went high')
-            elif self.pinsIn[channel]['name'] == 'cleanlvl':
-                print('cleanlvl went high')
-            elif self.pinsIn[channel]['name'] == 'aqualvl':
-                print('aqualvl went high, turning off motors')
-                self.motorControl(name='drv0', speed=0, direction = 'brake')
-                self.display.drawStatus(text1='Aqua Hi', text2=('temp: ' + str(self.get_temp())))
-            elif self.pinsIn[channel]['name'] == 'sparelvl':
-                print('sparelvl went high')
+        if GPIO.input(channel) == 1:
+            self.updateState(channel, 1)
+            #self.motorControl(name='drv0', speed=0, direction = 'brake')
+            self.drv8825(0,0,0,disable=True)
+            self.display.drawStatus(text1='Full Aquarium', text2=('temp: ' + str(self.get_temp())))
+        if GPIO.input(channel) == 0:
+            self.updateState(channel, 0)
+
+    def drv8825(self, frequency, direction, steps, disable = False, stepEnPin = 20, stepDirPin = 21, stepStepPin = 18):
+        if disable == True: #disables motor
+            GPIO.output(stepEnPin, 1)
+            logging.info("motor disable triggered, turning motor off")
         else:
-            self.pinsIn[channel]['state'] = 0
-            print("pin state set to %s" %(str(self.pinsIn[channel]['state']))) # debug
- 
-
-    def resetState(self, channel):
-        self.pinsIn[channel]['state'] = 0
-        print("pin state set to %s" %(self.pinsIn[channel]['state'])) # debug
-
+            stepTime = 1/frequency/2 #duration for high, duration for low
+            totalTime = 1/frequency * steps #calculates total estimated time for routine to finish
+            GPIO.output(stepDirPin, direction)
+            GPIO.output(stepEnPin, 0) #LOW enable drv8825 chip
+            logging.info("Stepper enabled, estimated time %s" %(str(totalTime)))
+            count = 0
+            while count <= steps:
+                GPIO.output(stepStepPin, 1)
+                time.sleep(stepTime)
+                GPIO.output(stepStepPin,0)
+                time.sleep(stepTime)
+                count += 1
+            GPIO.output(stepEnPin,1) #disable stepper power
+            logging.info("Steppers finished %s steps at frequency %s, stepper disabled" % (count-1, frequency))
 
     def motorFault(self, channel):
         #GPIO.add_event_detect(channel, GPIO.RISING, callback=my_callback, bouncetime=200)
         for i in self.motors:
             if self.motors[i]['faultpin'] == channel:
-                print("%s has tripped a fault" %(str(i)))
+                logging.info("%s has tripped a fault" %(str(i)))
 
     def motorControl(self, name='drv0', i2cAddress=0x60, speed=1, direction='forward'):
         if speed > 1:
@@ -165,41 +232,16 @@ class aquarium:
         self.motors[name]['direction'] = direction
         self.motors[name]['state'] = (direction + " direction @ speed " + str(speed))
 
-    def stateMonitor(self):
-        #detects if level sensors have gone high
-        return('hi')
 
-    def get_status(self):
-        return {
-            'temp': self.get_temp(),
-            'motor1' : self.motors['drv0']['state'],
-            'motor2' : self.motors['drv0']['state'],
-            'AqFlag' : self.pinsIn[13]['state'],
-            'CleanFlag' : self.pinsIn[19]['state'],
-            'WasteFlag' : self.pinsIn[6]['state'],
-            'SpareFlag' : self.pinsIn[26]['state'],
-            'time' : datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
-        } #0 is celcius, 1 is farenheit
-
-    def get_temp(self):
-        return self.aqtemp.read_temp()[0] #0 is celcius, 1 is farenheit
-
-    def drv8825(self, frequency, direction, steps, stepEnPin = 20, stepDirPin = 21, stepStepPin = 18):
-        stepTime = 1/frequency/2 #duration for high, duration for low
-        totalTime = 1/frequency * steps #calculates total estimated time for routine to finish
-        if direction == 1:
-            GPIO.output(stepDirPin, 1)
-        else:
-            GPIO.output(stepDirPin, 0)
-        GPIO.output(stepEnPin, 0) #enable drv8825 chip
-        print("Stepper enabled, estimated time %s" %(str(totalTime)))
-        count = 0
-        while count <= steps:
-            GPIO.output(stepStepPin, 1)
-            time.sleep(stepTime)
-            GPIO.output(stepStepPin,0)
-            time.sleep(stepTime)
-            count += 1
-        print("Steppers finished %s steps at frequency %s" % (steps, frequency))
-        GPIO.output(stepEnPin,1) #disable stepper power
-        print("Stepper disabled")
+'''
+class myThread (threading.Thread):
+   def __init__(self, threadID, name, counter, functionPass):
+      threading.Thread.__init__(self)
+      self.threadID = threadID
+      self.name = name
+      self.counter = counter
+   def run(self):
+      print("Starting thread: " + self.name)
+      self.functionPass
+      print("Exiting thread: " + self.name)
+'''
