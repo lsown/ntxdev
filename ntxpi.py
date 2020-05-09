@@ -261,13 +261,15 @@ class stepMotor:
     def calculateTime(self, frequency, steps):
         stepTime = 1/frequency/2 #duration for high, duration for low
         totalTime = 1/frequency * steps #calculates total estimated time for routine to finish
-        logging.info("Stepper enabled, estimated time %s" %(str(totalTime)))
-        return [stepTime, totalTime]
+        logging.info("Stepper estimated time %s" %(str(totalTime)))
+        return [totalTime, stepTime]
 
     def setDirection(self, direction):
         if (direction == 0):
+            GPIO.output(self.stepDirPin, 0)
             logging.info("set to cw")
         if (direction == 1):
+            GPIO.output(self.stepDirPin, 1)
             logging.info("set to ccw")
 
     def enableMotor(self):
@@ -291,10 +293,10 @@ class stepMotor:
     def stepRequest(self, steps):
         self.enableMotor()
         totalTime = 1 / self.frequency * steps
+        logging.info("Estimated time for %s steps: %s" %(str(steps), str(totalTime)))
         timerThread = threading.Timer(totalTime, self.disableMotor)
         self.pwm.start(self.dutyCycle)
         timerThread.start()
-
         
                 
         
