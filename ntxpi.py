@@ -280,7 +280,7 @@ class stepMotor:
         logging.info("motor disabled")
 
     def changeRotation(self, rotation):
-        if (rotation == 0):
+        if (rotation == 'cw'):
             GPIO.output(self.stepDirPin, 0)
             self.direction = 0 #update direction of object
             logging.info("set to cw, stepDirPin LOW")
