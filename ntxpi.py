@@ -93,8 +93,8 @@ class aquarium:
                 )
             )
         
-        self.displayThread = threading.Thread(target=self.stream_temp, daemon=True)
-        self.displayThread.start()
+        #self.displayThread = threading.Thread(target=self.stream_temp, daemon=True)
+        #self.displayThread.start()
 
     def piSetup(self): #Sets up GPIO pins, can also add to GPIO.in <pull_up_down=GPIO.PUD_UP>
 
@@ -311,7 +311,10 @@ class stepMotor:
         self.enableMotor()
         self.pwm.start(self.dutyCycle)
 
-        
+    def stepConfig(self, frequency, rotation, dutyCycle):
+        self.changeFrequency(frequency)
+        self.changeRotation(rotation)
+        self.changeDutyCycle(dutyCycle)
                 
         
 
