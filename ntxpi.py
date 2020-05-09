@@ -256,7 +256,7 @@ class stepMotor:
         self.stepDirPin = 21
         self.stepStepPin = 18
         
-        self.pwm = GPIO.pwm(self.stepStepPin, self.frequency) #initializes pwm object
+        self.pwm = GPIO.PWM(self.stepStepPin, self.frequency) #initializes pwm object
 
     def calculateTime(self, frequency, steps):
         stepTime = 1/frequency/2 #duration for high, duration for low
