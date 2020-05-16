@@ -195,7 +195,7 @@ class aquarium:
             json.dump(data, outfile)
             outfile.close()
 
-    def readConfig(self, data, filename = 'aqConfig.json'):
+    def readConfig(self, filename = 'aqConfig.json'):
         with open(filename, 'r') as json_data_file:
             data = json.load(json_data_file)
             json_data_file.close()
