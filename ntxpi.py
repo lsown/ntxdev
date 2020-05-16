@@ -6,11 +6,12 @@ from datetime import datetime
 import threading
 import random
 import logging
+import json
 
 #Rpi related objects
 from RPi import GPIO as GPIO
 GPIO.setmode(GPIO.BCM)
-import drv8830 #motor drive library
+#import drv8830 #motor drive library
 import i2cdisplay
 
 
@@ -84,7 +85,7 @@ class aquarium:
         }
         logging.info('Initializing NTXpi object')
         self.piSetup() #sets up the pi pin configurations
-        self.drv8830Setup() #sets up the channels for i2c motor drivers
+        #self.drv8830Setup() #sets up the channels for i2c motor drivers
         self.stepMotor = stepMotor(500, 0)
         self.display = i2cdisplay.display() #creates a display object
         self.display.drawStatus(
@@ -189,6 +190,19 @@ class aquarium:
         if GPIO.input(channel) == 0:
             self.updateState(channel, 0)
 
+    def writeConfig(self, data, filename = 'aqConfig.json'):
+        with open(filename, 'w') as outfile:
+            json.dump(data, outfile)
+            outfile.close()
+
+    def readConfig(self, data, filename = 'aqConfig.json'):
+        with open(filename, 'r') as json_data_file:
+            data = json.load(json_data_file)
+            json_data_file.close()
+            return data
+
+
+'''
     def motorFault(self, channel):
         #GPIO.add_event_detect(channel, GPIO.RISING, callback=my_callback, bouncetime=200)
         for i in self.motors:
@@ -218,6 +232,7 @@ class aquarium:
         self.drv0 = drv8830.DRV8830(i2c_addr=0x60)
         self.drv1 = drv8830.DRV8830(i2c_addr=0x61)
         #self.drv2 = drv8830.DRV8830(i2c_addr=0x62) #note, change HW to 0x63 to work with library
+'''
 
 '''
 class myThread (threading.Thread):
