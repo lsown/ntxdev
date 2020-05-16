@@ -253,10 +253,12 @@ class stepMotor:
 
     def enableMotor(self):
         GPIO.output(self.stepEnPin, 0)
+        self.pwm.start(self.dutyCycle)
         logging.info("motor enabled")
 
     def disableMotor(self):
         GPIO.output(self.stepEnPin, 1)
+        self.pwm.stop()
         logging.info("motor disabled")
 
     def changeRotation(self, rotation):
@@ -284,12 +286,12 @@ class stepMotor:
         totalTime = 1 / self.frequency * steps
         logging.info("Estimated time for %s steps @ %s: %s" %(str(steps), str(self.frequency), str(totalTime)))
         timerThread = threading.Timer(totalTime, self.disableMotor)
-        self.pwm.start(self.dutyCycle)
+
         timerThread.start()
 
     def stepInfinite(self, rotation):
+        self.changeRotation(rotation)
         self.enableMotor()
-        self.pwm.start(self.dutyCycle)
 
     def stepConfig(self, frequency, rotation, dutyCycle):
         self.changeFrequency(frequency)
