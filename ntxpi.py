@@ -6,11 +6,12 @@ from datetime import datetime
 import threading
 import random
 import logging
+import json
 
 #Rpi related objects
 from RPi import GPIO as GPIO
 GPIO.setmode(GPIO.BCM)
-import drv8830 #motor drive library
+#import drv8830 #motor drive library
 import i2cdisplay
 
 
@@ -84,8 +85,8 @@ class aquarium:
         }
         logging.info('Initializing NTXpi object')
         self.piSetup() #sets up the pi pin configurations
-        self.drv8830Setup() #sets up the channels for i2c motor drivers
-
+        #self.drv8830Setup() #sets up the channels for i2c motor drivers
+        self.stepMotor = stepMotor(500, 0)
         self.display = i2cdisplay.display() #creates a display object
         self.display.drawStatus(
             text1='NTXPi Ready', 
@@ -117,16 +118,6 @@ class aquarium:
                 GPIO.add_event_detect(self.pinsIn[i]['pin'], GPIO.RISING, callback=self.buttonPress, bouncetime=500) 
                 logging.info('%s set as button callback' %(str(self.pinsIn[i]['name'])))
 
-
-            #elif self.pinsIn[i]['pinType'] == 'motor':
-                #GPIO.add_event_detect(pin, GPIO.FALLING, callback=self.motorFault, bouncetime=100) 
-                #print(str(self.pinsIn[i]['pin']) + ' set as motor callback')
-
-    def drv8830Setup(self):
-        self.drv0 = drv8830.DRV8830(i2c_addr=0x60)
-        self.drv1 = drv8830.DRV8830(i2c_addr=0x61)
-        #self.drv2 = drv8830.DRV8830(i2c_addr=0x62) #note, change HW to 0x63 to work with library
-
     def get_status(self):
         return {
             'temp': self.get_temp(), #0 is celcius, 1 is farenheit
@@ -148,6 +139,12 @@ class aquarium:
             self.display.drawStatus(text1='Temp Grab', text2=('temp: %s' %(str(self.get_temp()))))
             time.sleep(5)
 
+    def flag_hi(self):
+        for i in self.pinsIn:
+            if i['pinType'] == 'levelSensor':
+                if i['state'] == 1:
+                    return True
+
 
     def updateState(self, channel, value):
         for i in self.pinsIn:
@@ -163,16 +160,22 @@ class aquarium:
                 GPIO.output(self.pinsOut['LEDPwr']['pin'], 1)
                 self.pinsIn['buttonSig']['priorState'] = 1
                 self.display.drawStatus(text1='pumping', text2=('temp: %s' %(str(self.get_temp()))))
+                
+                if self.pinsIn['aquaFlag']['state'] == 0:
+                    self.stepMotor.stepInfinite('cw')
+                else:
+                    pass
+                    logging.info('Aqua Flag still high, motor remains disabled')              
+                '''
+                #old code for running
                 motorThread = threading.Thread(target=self.drv8825, args=(600,0,10000,), daemon=True)
                 motorThread.start()
-                #self.drv8825(frequency = 600, direction = 1, steps = 10000)
-                #self.motorControl(name='drv0', speed = 1, direction = 'forward')
+                '''
             else:
                 GPIO.output(self.pinsOut['LEDPwr']['pin'], 0)
                 self.pinsIn['buttonSig']['priorState'] = 0
-                self.display.drawStatus(text1='NTXPi Ready!', text2=('temp: %s' %(str(self.get_temp()))))
-                self.drv8825(0, 0, 0, disable=True)
-                #self.motorControl(name='drv0', speed = 0, direction = 'brake')
+                self.display.drawStatus(text1='NTXPi Ready!', text2=('temp: %s' %(str(self.get_temp()))))    
+                self.stepMotor.disableMotor() #disables stepper
             print('LED state changed to %s' %(str(self.pinsIn['buttonSig']['priorState'])))
             self.buttonTime = time.time() #sets a time for last button press
         global exit_loop
@@ -182,31 +185,24 @@ class aquarium:
         if GPIO.input(channel) == 1:
             self.updateState(channel, 1)
             #self.motorControl(name='drv0', speed=0, direction = 'brake')
-            self.drv8825(0,0,0,disable=True)
+            self.stepMotor.disableMotor() #disables stepper
             self.display.drawStatus(text1='Full Aquarium', text2=('temp: ' + str(self.get_temp())))
         if GPIO.input(channel) == 0:
             self.updateState(channel, 0)
 
-    def drv8825(self, frequency, direction, steps, disable = False, stepEnPin = 20, stepDirPin = 21, stepStepPin = 18):
-        if disable == True: #disables motor
-            GPIO.output(stepEnPin, 1)
-            logging.info("motor disable triggered, turning motor off")
-        else:
-            stepTime = 1/frequency/2 #duration for high, duration for low
-            totalTime = 1/frequency * steps #calculates total estimated time for routine to finish
-            GPIO.output(stepDirPin, direction)
-            GPIO.output(stepEnPin, 0) #LOW enable drv8825 chip
-            logging.info("Stepper enabled, estimated time %s" %(str(totalTime)))
-            count = 0
-            while count <= steps:
-                GPIO.output(stepStepPin, 1)
-                time.sleep(stepTime)
-                GPIO.output(stepStepPin,0)
-                time.sleep(stepTime)
-                count += 1
-            GPIO.output(stepEnPin,1) #disable stepper power
-            logging.info("Steppers finished %s steps at frequency %s, stepper disabled" % (count-1, frequency))
+    def writeConfig(self, data, filename = 'aqConfig.json'):
+        with open(filename, 'w') as outfile:
+            json.dump(data, outfile)
+            outfile.close()
 
+    def readConfig(self, filename = 'aqConfig.json'):
+        with open(filename, 'r') as json_data_file:
+            data = json.load(json_data_file)
+            json_data_file.close()
+            return data
+
+
+'''
     def motorFault(self, channel):
         #GPIO.add_event_detect(channel, GPIO.RISING, callback=my_callback, bouncetime=200)
         for i in self.motors:
@@ -232,6 +228,11 @@ class aquarium:
         self.motors[name]['direction'] = direction
         self.motors[name]['state'] = (direction + " direction @ speed " + str(speed))
 
+    def drv8830Setup(self):
+        self.drv0 = drv8830.DRV8830(i2c_addr=0x60)
+        self.drv1 = drv8830.DRV8830(i2c_addr=0x61)
+        #self.drv2 = drv8830.DRV8830(i2c_addr=0x62) #note, change HW to 0x63 to work with library
+'''
 
 '''
 class myThread (threading.Thread):
@@ -245,3 +246,73 @@ class myThread (threading.Thread):
       self.functionPass
       print("Exiting thread: " + self.name)
 '''
+
+class stepMotor:
+    def __init__(self, frequency, direction, steps=0, disable = False, dutyCycle = 50, stepEnPin = 20, stepDirPin = 21, stepStepPin = 18):
+        self.frequency = frequency
+        self.direction = direction
+        self.steps = steps
+        self.disable = disable
+        self.dutyCycle = dutyCycle #default 50%
+        self.stepEnPin = 20
+        self.stepDirPin = 21
+        self.stepStepPin = 18
+        
+        self.pwm = GPIO.PWM(self.stepStepPin, self.frequency) #initializes pwm object
+
+    def calculateTime(self, frequency, steps):
+        stepTime = 1/frequency/2 #duration for high, duration for low
+        totalTime = 1/frequency * steps #calculates total estimated time for routine to finish
+        logging.info("Stepper estimated time %s" %(str(totalTime)))
+        return [totalTime, stepTime]
+
+    def enableMotor(self):
+        GPIO.output(self.stepEnPin, 0)
+        self.pwm.start(self.dutyCycle)
+        logging.info("motor enabled")
+
+    def disableMotor(self):
+        GPIO.output(self.stepEnPin, 1)
+        self.pwm.stop()
+        logging.info("motor disabled")
+
+    def changeRotation(self, rotation):
+        if (rotation == 'cw'):
+            GPIO.output(self.stepDirPin, 0)
+            self.direction = 0 #update direction of object
+            logging.info("set to cw, stepDirPin LOW")
+        else:
+            GPIO.output(self.stepDirPin, 1)
+            self.direction = 1 #update direction of object
+            logging.info("set to ccw, stepDirPin HI")
+
+    def changeFrequency(self, frequency):
+        self.frequency = frequency #update frequency of object
+        self.pwm.ChangeFrequency(frequency)
+        logging.info("Frequency changed to %s Hz" %(frequency))
+
+    def changeDutyCycle(self, dutyCycle):
+        self.dutyCycle = dutyCycle #update dutyCycle of object
+        self.pwm.ChangeDutyCycle(dutyCycle)
+        logging.info("Duty cycle changed %s percent" %(str(dutyCycle)))
+
+    def stepRequest(self, steps):
+        self.enableMotor()
+        totalTime = 1 / self.frequency * steps
+        logging.info("Estimated time for %s steps @ %s: %s" %(str(steps), str(self.frequency), str(totalTime)))
+        timerThread = threading.Timer(totalTime, self.disableMotor)
+
+        timerThread.start()
+
+    def stepInfinite(self, rotation):
+        self.changeRotation(rotation)
+        self.enableMotor()
+
+    def stepConfig(self, frequency, rotation, dutyCycle):
+        self.changeFrequency(frequency)
+        self.changeRotation(rotation)
+        self.changeDutyCycle(dutyCycle)
+                
+        
+
+
